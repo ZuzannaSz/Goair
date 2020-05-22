@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "246365581385",
+    "firebase_url": "https://goairlight-a4c04.firebaseio.com",
+    "project_id": "goairlight-a4c04",
+    "storage_bucket": "goairlight-a4c04.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246365581385:android:bfef0bafa3da31f202cf98",
+        "android_client_info": {
+          "package_name": "com.example.goairtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246365581385-bpt54k8jj9u02iot0nk9jcrhcrevsjt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkay1_NHCopjN7FPoG03Y_8pqw8d8xJh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246365581385-bpt54k8jj9u02iot0nk9jcrhcrevsjt3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
