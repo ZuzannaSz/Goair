@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#009688</color>
-    <color name="lightgray">#595858</color>
-   <color name="blue">#008495</color>
-    <color name="green">#B4E6B6</color>
+    <color name="colorPrimary">#72BB53</color>
+    <color name="green">#72BB53</color>
+    <color name="lightgray">#606060</color>
+   <color name="blue">#00695C</color>
+    <color name="lightGreen">#AED581</color>
+    <color name="pastelGreen">#DFEDD6</color>
     <color name="gray">#433F3F</color>
     <color name="white">#FFFFFF</color>
+    <color name="darkGreen">#243E16</color>
     <color name="lightblue">#DAF6FA</color>
-    <color name="slategray">#789F7E</color>
+    <color name="slategray">#628167</color>
 </resources>

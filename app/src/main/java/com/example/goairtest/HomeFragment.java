@@ -35,8 +35,7 @@ public class HomeFragment extends Fragment {
                     temp.setText(Integer.toString(db.getLastTH().getTemperature()));
                     TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
                     hum.setText(Integer.toString(db.getLastTH().getHumidity()));
-                    TextView text2 = (TextView) requireActivity().findViewById(R.id.dynamicLocation);
-                    text2.setText(Double.toString(d.getLatitude()) + " " + Double.toString(d.getLongitude()) + "" + Double.toString(d.getAltitude()));
+
                 } else {
                     TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
                     text.setText("---");
@@ -44,8 +43,6 @@ public class HomeFragment extends Fragment {
                     temp.setText("---");
                     TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
                     hum.setText("---");
-                    TextView text2 = (TextView) requireActivity().findViewById(R.id.dynamicLocation);
-                    text2.setText("---");
                 }
 
             }
@@ -66,8 +63,6 @@ public class HomeFragment extends Fragment {
             temp.setText(Integer.toString(db.getLastTH().getTemperature()));
             TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
             hum.setText(Integer.toString(db.getLastTH().getHumidity()));
-            TextView text2 = (TextView) requireActivity().findViewById(R.id.dynamicLocation);
-            text2.setText(Double.toString(d.getLatitude()) + " " + Double.toString(d.getLongitude()) + "" + Double.toString(d.getAltitude()));
         } else {
             TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
             text.setText("---");
@@ -75,8 +70,7 @@ public class HomeFragment extends Fragment {
             temp.setText("---");
             TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
             hum.setText("---");
-            TextView text2 = (TextView) requireActivity().findViewById(R.id.dynamicLocation);
-            text2.setText("---");
+
         }
     }
 

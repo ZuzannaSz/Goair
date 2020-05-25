@@ -1,5 +1,6 @@
 package com.example.goairtest;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -40,7 +41,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
+
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 import java.util.Set;
@@ -62,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean stopThread = false;
     private boolean connected = false;
     private LocationManager locationManager;
+    private Button login;
+    private TextView loginText;
+    private FirebaseAuth auth;
     Location location = null;
     private String provider = null;
     private  TextView text;
@@ -80,7 +90,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         bltOn();
         locationRequest();
 
-        if (ContextCompat.checkSelfPermission(this,
+
+       blt = (ToggleButton) findViewById(R.id.button_blt);
+       navigationSetup();
+       if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationEnabled =true;
@@ -88,11 +101,49 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
-       blt = (ToggleButton) findViewById(R.id.button_blt);
-       navigationSetup();
+
         if(getFragmentRefreshListener()!= null){
             getFragmentRefreshListener().onRefresh();
         }
+        login = findViewById(R.id.loginMain);
+        loginText = findViewById(R.id.loginView);
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser==null)
+        {
+            login.setText("Login");
+            loginText.setText("To use community features you need to login");
+        }
+        else
+        {
+            loginText.setText("Logout");
+            loginText.setText("You are logged in as:" + currentUser.getEmail());
+        }
+        login.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                FirebaseUser currentUser = auth.getCurrentUser();
+                if(currentUser==null)
+                {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                   //popup here asking if you want to log out
+                    AuthUI.getInstance().signOut(MainActivity.this)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    // user is now signed out
+                                    Toast.makeText(MainActivity.this, "Logged out",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
+        });
         b = (Button) findViewById(R.id.test);
         b .setOnClickListener(new View.OnClickListener() {
             @Override
