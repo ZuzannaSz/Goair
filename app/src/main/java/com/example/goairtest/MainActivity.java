@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,16 +17,19 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -40,16 +41,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
-import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
@@ -82,43 +85,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setup();
         db = new DatabaseHandler(this);
-
-        text = (TextView) findViewById(R.id.localisation);
-
         ba = BluetoothAdapter.getDefaultAdapter();
-        bltOn();
-        locationRequest();
-
-
-       blt = (ToggleButton) findViewById(R.id.button_blt);
-       navigationSetup();
-       if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationEnabled =true;
-            locationOn();
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
-
         if(getFragmentRefreshListener()!= null){
             getFragmentRefreshListener().onRefresh();
         }
-        login = findViewById(R.id.loginMain);
-        loginText = findViewById(R.id.loginView);
-        auth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser==null)
-        {
-            login.setText("Login");
-            loginText.setText("To use community features you need to login");
-        }
-        else
-        {
-            loginText.setText("Logout");
-            loginText.setText("You are logged in as:" + currentUser.getEmail());
-        }
+        bltOn();
+        locationRequest();
+        navigationSetup();
+        locationGetter();
+        authenticate();
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -127,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 FirebaseUser currentUser = auth.getCurrentUser();
                 if(currentUser==null)
                 {
+                    finish();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
@@ -136,14 +114,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     AuthUI.getInstance().signOut(MainActivity.this)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    // user is now signed out
-                                    Toast.makeText(MainActivity.this, "Logged out",
-                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
+                                    login.setText("Login");
+                                    loginText.setText("");
                                 }
                             });
                 }
             }
         });
+       FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
         b = (Button) findViewById(R.id.test);
         b .setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,6 +141,38 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+    public void locationGetter()
+    {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationEnabled =true;
+            locationOn();
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+    }
+    public void authenticate()
+    {
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser==null)
+        {
+            login.setText("Login");
+        }
+        else
+        {
+            login.setText("Logout");
+            loginText.setText(currentUser.getEmail());
+        }
+    }
+    public void setup()
+    {
+        text = (TextView) findViewById(R.id.localisation);
+        blt = (ToggleButton) findViewById(R.id.button_blt);
+        login = findViewById(R.id.loginMain);
+        loginText = findViewById(R.id.loginView);
+    }
     public FragmentRefreshListener getFragmentRefreshListener() {
         return fragmentRefreshListener;
     }

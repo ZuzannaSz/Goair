@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +19,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.io.IOException;
 
 import static com.firebase.ui.auth.AuthUI.TAG;
 
@@ -31,6 +36,7 @@ public class LoginActivity extends Activity {
         auth= FirebaseAuth.getInstance();
         email = findViewById(R.id.loginmail);
         password = findViewById(R.id.loginpassword);
+        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         login = findViewById(R.id.login);
         signup = findViewById(R.id.loginsignup);
         recover = findViewById(R.id.forgotpassword);
@@ -42,6 +48,7 @@ public class LoginActivity extends Activity {
                 userLogin();
             }
         });
+
         signup.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -86,5 +93,17 @@ public class LoginActivity extends Activity {
 
                     }
                 });
+
+    }
+    public void toggleHandle(View view)
+    {
+        boolean on = ((ToggleButton) view).isChecked();
+
+        if (on) {
+            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+
+        } else {
+             password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        }
     }
 }

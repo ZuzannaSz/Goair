@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 
@@ -33,6 +36,7 @@ public class SignupActivity extends Activity {
         auth= FirebaseAuth.getInstance();
         email=findViewById(R.id.signupmail);
         password = findViewById(R.id.signuppassword);
+        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         signup = findViewById(R.id.signup);
         signup.setOnClickListener(new View.OnClickListener()
         {
@@ -78,12 +82,15 @@ public class SignupActivity extends Activity {
                     }
                 });
     }
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            //user email id text view. signin button fidnbyid().setVisibitili(View.GONE), signout view.VISIBLE?
+    public void toggleHandle(View view)
+    {
+        boolean on = ((ToggleButton) view).isChecked();
+
+        if (on) {
+            password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
 
         } else {
-            //signed out, sign in button
+            password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }
 }
