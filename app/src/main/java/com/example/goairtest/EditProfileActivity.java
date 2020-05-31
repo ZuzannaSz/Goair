@@ -12,6 +12,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -98,10 +101,29 @@ public class EditProfileActivity extends Activity {
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
 
-        final EditText oldPass = (EditText) promptsView
+        final EditText oldPass = promptsView
                 .findViewById(R.id.oldPassword);
-        final EditText newPass = (EditText) promptsView.findViewById(R.id.newPassword);
+        final EditText newPass = promptsView.findViewById(R.id.newPassword);
         // set dialog message
+        newPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        oldPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+       final ToggleButton see = promptsView.findViewById(R.id.showlogin);
+        see.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean on = see.isChecked();
+
+                if (on) {
+                    newPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    oldPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+
+                } else {
+                    newPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    oldPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }
+            }
+        });
+
         alertDialogBuilder
                 .setCancelable(false)
                 .setPositiveButton("OK",
@@ -201,10 +223,24 @@ public class EditProfileActivity extends Activity {
         // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
 
-        final EditText userInput = (EditText) promptsView
+        final EditText userInput = promptsView
                 .findViewById(R.id.passwordDialog);
         TextView text = promptsView.findViewById(R.id.popupText);
+        userInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
         text.setText("Do you really want to delete your account? \\n Confirm with password");
+        final ToggleButton see = promptsView.findViewById(R.id.showlogin);
+        see.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean on = see.isChecked();
+
+                if (on) {
+                    userInput.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                } else {
+                    userInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                }
+            }
+        });
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)

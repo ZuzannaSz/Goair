@@ -13,7 +13,6 @@
         android:layout_marginTop="40dp"
         android:background="@color/green"
         android:textColor="@color/white"
-
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -26,6 +25,7 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:background="@color/lightGreen"
+        android:src="@drawable/person"
         app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -39,8 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:textColor="@color/white"
-        android:textSize="30sp"
-
+        android:textSize="25sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

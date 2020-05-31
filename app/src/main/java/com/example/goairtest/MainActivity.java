@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,20 +38,26 @@ import android.widget.ToggleButton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.Set;
@@ -78,24 +85,121 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Location location = null;
     private String provider = null;
     private  TextView text;
-    private int polutionTest = 666;
+    private int polutionTest = 700;
+    private String updated;
     private FragmentRefreshListener fragmentRefreshListener;
-
+private FirebaseFirestore mFirestore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user!=null;
+     /*   Uri uri = user.getPhotoUrl();
+       ImageView img = findViewById(R.id.profile);
+        if(uri!=null)
+        {
+            Glide.with(this).load(uri).error(R.mipmap.ic_launcher)
+                    .placeholder(R.drawable.person)
+                    .into(img);
+            //Picasso.with(getContext()).load(uri.toString()).into(img);
+        }*/
         setup();
         db = new DatabaseHandler(this);
         ba = BluetoothAdapter.getDefaultAdapter();
         if(getFragmentRefreshListener()!= null){
             getFragmentRefreshListener().onRefresh();
         }
+
         bltOn();
+        initFirestore();
         locationRequest();
         navigationSetup();
         locationGetter();
-        authenticate();
+        authView();
+        handleLogin();
+       testButton();
+    }
+    private void initFirestore() {
+        mFirestore = FirebaseFirestore.getInstance();
+    }
+    public void testButton() {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        b = findViewById(R.id.test);
+        b .setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(location!=null)
+                {
+                    Data data2 = new Data(location.getLatitude(),location.getLongitude(),location.getAltitude(),polutionTest, getDate(),"false");
+                    TempHum th = new TempHum(25, 40,getDate(),"false");
+
+                    polutionTest+=20;
+                    db.addData(data2);
+                    db.addTH(th);
+                    data2 = db.getLast();
+                    th = db.getLastTH();
+                    addDataToFirebase(data2);
+                    addTHToFirebase(th);
+                    if(getFragmentRefreshListener()!= null){
+                        getFragmentRefreshListener().onRefresh();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Waiting for location", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+    }
+    public void addDataToFirebase(Data data)
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user!=null)
+        {
+            addToFirebase("Latitude", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
+            addToFirebase("Longitude", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
+            addToFirebase("Altitude", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
+            addToFirebase("Co2", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
+
+        }
+
+    }
+    public void addTHToFirebase(TempHum tempHum) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            addToFirebase("Temperature", String.valueOf(tempHum.getTemperature()), String.valueOf(tempHum.getID()), user.getUid(), String.valueOf(tempHum.getDate()));
+            addToFirebase("Humidity", String.valueOf(tempHum.getHumidity()), String.valueOf(tempHum.getID()), user.getUid(), String.valueOf(tempHum.getDate()));
+        }
+    }
+    public void addToFirebase(String dataType, String data, String key, String user, String time )
+    {
+        Map<String, Object> doc = new HashMap<>();
+        doc.put(dataType, data);
+        doc.put("IdBiker", user);
+        doc.put("Key", key);
+        doc.put("TimeStamp", time);
+
+        mFirestore.collection(dataType).document()
+                .set(doc)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("firebase", "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("firebase", "Error writing document", e);
+                    }
+                });
+    }
+    public void handleLogin()
+    {
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -104,13 +208,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 FirebaseUser currentUser = auth.getCurrentUser();
                 if(currentUser==null)
                 {
-                    finish();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
                 else
                 {
-                   //popup here asking if you want to log out
+                    //popup here asking if you want to log out
                     AuthUI.getInstance().signOut(MainActivity.this)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -122,26 +225,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             }
         });
-       FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-        b = (Button) findViewById(R.id.test);
-        b .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Data data2 = new Data(location.getLatitude(),location.getLongitude(),location.getAltitude(),polutionTest, getDate());
-                TempHum th = new TempHum(25, 40,getDate());
-                polutionTest+=20;
-                db.addData(data2);
-                db.addTH(th);
-                if(getFragmentRefreshListener()!= null){
-                    getFragmentRefreshListener().onRefresh();
-                }
-            }
-        });
+    }
+    public FragmentRefreshListener getFragmentRefreshListener() {
+        return fragmentRefreshListener;
+    }
+    @Override
+    public void onLocationChanged(Location location) {
+        this.location =location;
+        //text.setText("location coordinates: " + location.getLatitude() + " " + location.getLongitude());
     }
 
-    public void locationGetter()
+    public void locationOn()
+    {
+    LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationOn = service
+            .isProviderEnabled(LocationManager.GPS_PROVIDER);
+    if (!locationOn) {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
+    }
+}    public void locationGetter()
     {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -152,87 +255,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
     }
-    public void authenticate()
-    {
-        auth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser==null)
-        {
-            login.setText("Login");
-        }
-        else
-        {
-            login.setText("Logout");
-            loginText.setText(currentUser.getEmail());
-        }
-    }
-    public void setup()
-    {
-        text = (TextView) findViewById(R.id.localisation);
-        blt = (ToggleButton) findViewById(R.id.button_blt);
-        login = findViewById(R.id.loginMain);
-        loginText = findViewById(R.id.loginView);
-    }
-    public FragmentRefreshListener getFragmentRefreshListener() {
-        return fragmentRefreshListener;
-    }
-    @Override
-    public void onLocationChanged(Location location) {
-        this.location =location;
-        text.setText(String.valueOf("location coordinates: "+ location.getLatitude() + " " + location.getLongitude()));
-
-    }
-    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
-        this.fragmentRefreshListener = fragmentRefreshListener;
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-    public void locationOn()
-    {
-    LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationOn = service
-            .isProviderEnabled(LocationManager.GPS_PROVIDER);
-    if (!locationOn) {
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivity(intent);
-    }
-}
-    public interface FragmentRefreshListener{
-        void onRefresh();
-    }
-    public void bltOn(){
-        if (!ba.isEnabled()) {
-            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(turnOn, 0);
-            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
-
-        }
-    }
-    public String getDate()
-    {
-        Date date = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-        String strDate = dateFormat.format(date);
-        return strDate;
-    }
     void receiveData(){
-
         final Handler handler = new Handler();
         final Thread thread  = new Thread(new Runnable() {
             public void run() {
-               while(!stopThread)
-               {
+               while(!stopThread) {
                     try {
                         int byteCount = inputStream.available();
                         if (byteCount > 0) {
                             byte[] rawBytes = new byte[byteCount];
                             inputStream.read(rawBytes);
-                            final String string = new String(rawBytes, "UTF-8");
+                            final String string = new String(rawBytes, StandardCharsets.UTF_8);
                             handler.post(new Runnable() {
                                 public void run() {
                                     saveData(string);
@@ -240,11 +273,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             });
                         }
                     }
-                    catch (IOException e)
-                    {
+                    catch (IOException e) {
                         stopThread=true;
                     }
-                };
+                }
             }
         });
         thread.start();
@@ -273,106 +305,33 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Log.d("exist", "data doesn't exist");
         }*/
     }
-    public void bltConnect() throws IOException
-    {
+    public void bltConnect() throws IOException {
         Set<BluetoothDevice> devices = ba.getBondedDevices();
-        if(devices.isEmpty())
-        {
+        if(devices.isEmpty()) {
            Toast.makeText(getApplicationContext(), "No devices are paired", Toast.LENGTH_LONG).show();
             connected =false;
         }
-        else
-        {
-            for(BluetoothDevice i : devices)
-            {
-                if(i.getName().equals("GOAirLight"))
-                {
+        else {
+            for(BluetoothDevice i : devices) {
+                if(i.getName().equals("GOAirLight")) {
                     device = i;
                     exists = true;
                     break;
                 }
             }
         }
-        if(exists)
-        {
+        if(exists) {
                 socket = device.createRfcommSocketToServiceRecord(PORT_UUID);
                 socket.connect();
                 inputStream = socket.getInputStream();
                 outputStream = socket.getOutputStream();
             connected = true;
             receiveData();
-
         }
-        else
-        {
+        else {
             Toast.makeText(getApplicationContext(), "Please pair the device", Toast.LENGTH_LONG).show();
             connected=false;
         }
-
-    }
-    public void navigationSetup()
-    {
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_map, R.id.navigation_settings)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
-    }
-  public void toggleHandle(View view)
-    {
-        boolean on = ((ToggleButton) view).isChecked();
-
-        if (on) {
-
-            try{
-                bltConnect();
-            }
-            catch (IOException e)
-            {
-                ((ToggleButton) view).setChecked(false);
-                e.printStackTrace();
-            }
-            if(!connected)
-            {
-                ((ToggleButton) view).setChecked(false);
-            }
-
-        } else {
-            try{
-                bltDisconnect();
-            }
-            catch (IOException e)
-            {
-                ((ToggleButton) view).setChecked(true);
-                e.printStackTrace();
-
-            }
-
-        }
-    }
-    void bltDisconnect() throws IOException {
-        if(connected)
-        {
-            stopThread= true;
-            outputStream.close();
-            inputStream.close();
-            socket.close();
-            connected =false;
-        }
-
-    }
-
-    public void onProviderEnabled(String string)
-    {
-        Toast.makeText(this, "Enabled new provider " + provider,
-                Toast.LENGTH_SHORT).show();
-    }
-    public void  onProviderDisabled(String string)
-    {
-        Toast.makeText(this, "Disabled provider " + provider,
-                Toast.LENGTH_SHORT).show();
     }
     public void locationRequest(){
         if (ContextCompat.checkSelfPermission(this,
@@ -388,6 +347,83 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         }
     }
+    public void bltOn(){
+        if (!ba.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        }
+    }
+    public void toggleHandle(View view) {
+        boolean on = ((ToggleButton) view).isChecked();
+        if (on) {
+            try{
+                bltConnect();
+            }
+            catch (IOException e) {
+                ((ToggleButton) view).setChecked(false);
+                e.printStackTrace();
+            }
+            if(!connected) {
+                ((ToggleButton) view).setChecked(false);
+            } } else {
+            try{
+                bltDisconnect();
+            }
+            catch (IOException e) {
+                ((ToggleButton) view).setChecked(true);
+                e.printStackTrace();
+            } }
+    }
+    void bltDisconnect() throws IOException {
+        if(connected) {
+            stopThread= true;
+            outputStream.close();
+            inputStream.close();
+            socket.close();
+            connected =false;
+        }
+    }
+    public void authView() {
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser==null) {
+            login.setText("Login");
+        }
+        else {
+            login.setText("Logout");
+            loginText.setText(currentUser.getEmail());
+        }
+    }
+    public void navigationSetup() {
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_map, R.id.navigation_settings)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+    }
+    public void setup()
+    {
+        text = findViewById(R.id.localisation);
+        blt = (ToggleButton) findViewById(R.id.button_blt);
+        login = findViewById(R.id.loginMain);
+        loginText = findViewById(R.id.loginView);
+    }
+    public String getDate() {
+        Date date = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        String strDate = dateFormat.format(date);
+        return strDate;
+    }
+    public interface FragmentRefreshListener{ void onRefresh();    }
+    public void onProviderEnabled(String string) {    }
+    public void  onProviderDisabled(String string) {    }
+    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
+        this.fragmentRefreshListener = fragmentRefreshListener; }
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {    }
 }
 /*
     List<Data> data = db.getAllData();

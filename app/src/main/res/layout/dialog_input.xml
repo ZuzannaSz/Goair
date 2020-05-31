@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout
     android:id="@+id/layoutDialog"
     android:layout_width="match_parent"
@@ -22,6 +23,17 @@
         android:id="@+id/passwordDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"> <requestFocus/></EditText>
+
+    <ToggleButton
+        android:id="@+id/showlogin"
+        android:layout_width="30dp"
+        android:layout_height="28dp"
+        android:background="@drawable/show"
+        android:backgroundTint="@color/bluetooth_selector"
+        android:textOff=""
+        android:textOn=""
+
+        />
 
 
 </LinearLayout>

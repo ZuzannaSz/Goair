@@ -7,19 +7,30 @@ public class TempHum {
     private int humidity;
     private int ID;
     private String date;
+    private String update;
     public  TempHum(){}
-    public TempHum(int id, int temperature, int humidity, String date)
+    public TempHum(int id, int temperature, int humidity, String date, String update)
     {
         this.humidity=humidity;
         this.temperature = temperature;
         this.ID = id;
         this.date = date;
+        this.update = update;
     }
-    public TempHum( int temperature, int humidity, String date)
+    public TempHum( int temperature, int humidity, String date, String update)
     {
         this.temperature = temperature;
         this.humidity= humidity;
         this.date = date;
+        this.update = update;
+    }
+
+    public String getUpdate() {
+        return update;
+    }
+
+    public void setUpdate(String update) {
+        this.update = update;
     }
 
     public int getHumidity() {

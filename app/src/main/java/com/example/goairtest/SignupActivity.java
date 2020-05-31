@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -29,10 +30,18 @@ public class SignupActivity extends Activity {
     private FirebaseAuth auth;
     private EditText email, password;
     private Button signup;
+    private DatabaseHandler db;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.signup);
+        db = new DatabaseHandler(this);
+        Data d = db.getLast();
+        TextView t = findViewById(R.id.testdb);
+        t.setText(Integer.toString(d.getPollution()));
+
+
         auth= FirebaseAuth.getInstance();
         email=findViewById(R.id.signupmail);
         password = findViewById(R.id.signuppassword);

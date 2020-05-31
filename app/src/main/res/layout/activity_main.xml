@@ -8,6 +8,7 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
+
     <TextView
         android:id="@+id/loginView"
         android:layout_width="match_parent"

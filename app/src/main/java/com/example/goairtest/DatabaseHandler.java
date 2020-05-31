@@ -22,6 +22,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_POLLUTION = "pollution";
     private static final String KEY_ALTITUDE = "altitude";
+    private static final String KEY_UPDATE = "updated";
 
     private static final String KEY_TEMPERATURE = "temperature";
     private static final String KEY_HUMIDITY = "humidity";
@@ -33,10 +34,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
     private static final String CREATE_TABLE_DATA = "CREATE TABLE "
             + TABLE_DATA + "(" + KEY_ID + " INTEGER PRIMARY KEY,"  + KEY_LATITUDE + " DOUBLE,"
-            + KEY_LONGITUDE + " DOUBLE," + KEY_ALTITUDE + " INTEGER," + KEY_POLLUTION + " INTEGER," + KEY_DATE + " TEXT" + ")";
+            + KEY_LONGITUDE + " DOUBLE," + KEY_ALTITUDE + " INTEGER," + KEY_POLLUTION + " INTEGER,"
+            + KEY_DATE + " TEXT," + KEY_UPDATE + " TEXT" + ")";
     private static final String CREATE_TABLE_TH =  "CREATE TABLE "
             + TABLE_TH + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TEMPERATURE + " INTEGER,"
-            + KEY_HUMIDITY + " INTEGER," + KEY_DATE + " TEXT" + ")";
+            + KEY_HUMIDITY + " INTEGER," + KEY_DATE + " TEXT," + KEY_UPDATE + " TEXT" + ")";
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_DATA);
@@ -58,6 +60,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_ALTITUDE, data.getAltitude());
         values.put(KEY_POLLUTION, data.getPollution());
         values.put(KEY_DATE, data.getDate());
+        values.put(KEY_UPDATE, data.getUpdate());
         db.insert(TABLE_DATA, null, values);
         db.close();
 }
@@ -68,13 +71,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_TEMPERATURE, tempHum.getTemperature());
         values.put(KEY_HUMIDITY, tempHum.getHumidity());
         values.put(KEY_DATE, tempHum.getDate());
+        values.put(KEY_UPDATE, tempHum.getUpdate());
         db.insert(TABLE_TH, null, values);
         db.close();
     }
     Data getData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_DATA, new String[]{KEY_ID,
-                        KEY_LATITUDE, KEY_LONGITUDE, KEY_ALTITUDE, KEY_POLLUTION, KEY_DATE}, KEY_ID + "=?",
+                        KEY_LATITUDE, KEY_LONGITUDE, KEY_ALTITUDE, KEY_POLLUTION, KEY_DATE, KEY_UPDATE}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
@@ -84,7 +88,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Double.parseDouble(cursor.getString(2)),
                 Double.parseDouble(cursor.getString(3)),
                 Integer.parseInt(cursor.getString(4)),
-                cursor.getString(5));
+                cursor.getString(5),
+                cursor.getString(6));
+
         db.close();
         return data;
     }
@@ -92,7 +98,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_TH, new String[]{KEY_ID,
-                        KEY_TEMPERATURE, KEY_HUMIDITY, KEY_DATE}, KEY_ID + "=?",
+                        KEY_TEMPERATURE, KEY_HUMIDITY, KEY_DATE, KEY_UPDATE}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
@@ -100,7 +106,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         TempHum th = new TempHum(Integer.parseInt(cursor.getString(0)),
                 Integer.parseInt(cursor.getString(1)),
                 Integer.parseInt(cursor.getString(2)),
-                cursor.getString(3));
+                cursor.getString(3),
+                cursor.getString(4));
         db.close();
         return th;
     }
@@ -136,7 +143,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     Double.parseDouble(cursor.getString(2)),
                     Double.parseDouble(cursor.getString(3)),
                     Integer.parseInt(cursor.getString(4)),
-                    cursor.getString(5));
+                    cursor.getString(5),
+                    cursor.getString(6));
         }
 
         db.close();
@@ -153,7 +161,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         TempHum th = new TempHum(Integer.parseInt(cursor.getString(0)),
                 Integer.parseInt(cursor.getString(1)),
                 Integer.parseInt(cursor.getString(2)),
-                cursor.getString(3));
+                cursor.getString(3),
+                cursor.getString(4));
         db.close();
         return th;
     }
@@ -178,6 +187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 data.setAltitude(Double.parseDouble(cursor.getString(3)));
                 data.setPollution(Integer.parseInt(cursor.getString(4)));
                 data.setDate(cursor.getString(5));
+                data.setUpdate(cursor.getString(6));
                 dataList.add(data);
             } while (cursor.moveToNext());
         }
@@ -213,28 +223,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 th.setTemperature(Integer.parseInt(cursor.getString(1)));
                 th.setHumidity(Integer.parseInt(cursor.getString(2)));
                 th.setDate(cursor.getString(3));
+                th.setUpdate(cursor.getString(4));
             }while (cursor.moveToNext());
         }
         db.close();
         return thList;
     }
-}
-/* public int updateData(int id, double latitude, double longitude, int pollution) {
+     public int updateData(Data data) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_LATITUDE, Double.toString(latitude));
-        values.put(KEY_LONGITUDE, Double.toString(longitude));
-        values.put(KEY_POLLUTION, Integer.toString(pollution));
-        int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + id, null);
+        values.put(KEY_LATITUDE, Double.toString(data.getLatitude()));
+        values.put(KEY_LONGITUDE, Double.toString(data.getLongitude()));
+        values.put(KEY_ALTITUDE, Double.toString(data.getAltitude()));
+        values.put(KEY_POLLUTION, Integer.toString(data.getPollution()));
+        values.put(KEY_DATE, data.getDate());
+        values.put(KEY_UPDATE, data.getUpdate());
+        int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + data.getID(), null);
         return 0;}
-        public boolean checkExistance(Data data) {
+        public int updateTH(TempHum tempHum)
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_TEMPERATURE, Integer.toString(tempHum.getTemperature()));
+            values.put(KEY_HUMIDITY, Integer.toString(tempHum.getHumidity()));
+            values.put(KEY_DATE, tempHum.getDate());
+            values.put(KEY_UPDATE, tempHum.getUpdate());
+            int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + tempHum.getID(), null);
+            return 0;
+        }
+}
+    /*public boolean checkExistance(Data data) {
         SQLiteDatabase db = this.getReadableDatabase();
         List<Data> dataList = new ArrayList<Data>();
         String selectQuery = "SELECT * FROM " + TABLE_DATA;
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {                if (data.getLatitude() == Integer.parseInt(cursor.getString(1))
-                        && data.getLongitude() == Integer.parseInt(cursor.getString(2))) {
-                    return true;
-                }            } while (cursor.moveToNext());        }
+                    && data.getLongitude() == Integer.parseInt(cursor.getString(2))) {
+                return true;
+            }            } while (cursor.moveToNext());        }
         return false; } */

@@ -31,19 +31,19 @@ public class HomeFragment extends Fragment {
                 DatabaseHandler db = new DatabaseHandler(getActivity());
                 if (db.checkDataPopulated()) {
                     Data d = db.getLast();
-                    TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
+                    TextView text = requireActivity().findViewById(R.id.pollutionView);
                     text.setText(Integer.toString(d.getPollution()));
-                    TextView temp = (TextView) requireActivity().findViewById(R.id.temperature);
+                    TextView temp = requireActivity().findViewById(R.id.temperature);
                     temp.setText(Integer.toString(db.getLastTH().getTemperature()));
-                    TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
+                    TextView hum = requireActivity().findViewById(R.id.humidity);
                     hum.setText(Integer.toString(db.getLastTH().getHumidity()));
 
                 } else {
-                    TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
+                    TextView text = requireActivity().findViewById(R.id.pollutionView);
                     text.setText("---");
-                    TextView temp = (TextView) requireActivity().findViewById(R.id.temperature);
+                    TextView temp = requireActivity().findViewById(R.id.temperature);
                     temp.setText("---");
-                    TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
+                    TextView hum = requireActivity().findViewById(R.id.humidity);
                     hum.setText("---");
                 }
 
@@ -61,18 +61,18 @@ public class HomeFragment extends Fragment {
         DatabaseHandler db = new DatabaseHandler(getActivity());
         if (db.checkDataPopulated()) {
             Data d = db.getLast();
-            TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
+            TextView text = requireActivity().findViewById(R.id.pollutionView);
             text.setText(Integer.toString(d.getPollution()));
-            TextView temp = (TextView) requireActivity().findViewById(R.id.temperature);
+            TextView temp = requireActivity().findViewById(R.id.temperature);
             temp.setText(Integer.toString(db.getLastTH().getTemperature()));
-            TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
+            TextView hum = requireActivity().findViewById(R.id.humidity);
             hum.setText(Integer.toString(db.getLastTH().getHumidity()));
         } else {
-            TextView text = (TextView) requireActivity().findViewById(R.id.pollutionView);
+            TextView text = requireActivity().findViewById(R.id.pollutionView);
             text.setText("---");
-            TextView temp = (TextView) requireActivity().findViewById(R.id.temperature);
+            TextView temp = requireActivity().findViewById(R.id.temperature);
             temp.setText("---");
-            TextView hum = (TextView) requireActivity().findViewById(R.id.humidity);
+            TextView hum = requireActivity().findViewById(R.id.humidity);
             hum.setText("---");
 
         }
