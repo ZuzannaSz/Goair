@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".HomeFragment">
 
-    <TextView
+  <!--  <TextView
         android:id="@+id/pollutionView"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -150,6 +150,6 @@
         app:layout_constraintHorizontal_bias="0.371"
         app:layout_constraintStart_toEndOf="@+id/humidity"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.755" />
+        app:layout_constraintVertical_bias="0.755" -->/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,16 +30,22 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.firebase.ui.auth.AuthUI.TAG;
 
@@ -51,6 +57,7 @@ public class EditProfileActivity extends Activity {
     private EditText username, password;
     private Button upload, delete, passwd;
     private  FirebaseUser user;
+    private FirebaseFirestore mFirestore;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -300,7 +307,7 @@ public class EditProfileActivity extends Activity {
     {
         Intent intent = new Intent();
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), GET_IMAGE);
     }
 
@@ -316,6 +323,8 @@ public class EditProfileActivity extends Activity {
                 Glide.with(this).load(path).error(R.mipmap.ic_launcher)
                         .placeholder(R.drawable.person)
                         .into(img);
+            Toast.makeText(EditProfileActivity.this, path.toString(),
+                    Toast.LENGTH_SHORT).show();
            // } catch (IOException e) {
           //      e.printStackTrace();
            // }

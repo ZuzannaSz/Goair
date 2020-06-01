@@ -14,15 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/white"
-        android:textAllCaps="false"
         android:gravity="center"
+        android:textAllCaps="false"
         android:textColor="@color/green"
         android:textStyle="italic|bold"
-        app:layout_constraintBottom_toBottomOf="@+id/nav_view"
+        app:layout_constraintBottom_toTopOf="@+id/logo"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/nav_host_fragment"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
@@ -32,36 +32,38 @@
         android:background="@drawable/help"
         android:backgroundTint="@color/green"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_blt"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/loginMain"
         app:layout_constraintTop_toTopOf="@+id/loginMain"
         app:layout_constraintVertical_bias="0.008" />
 
+
     <ToggleButton
         android:id="@+id/button_blt"
         android:layout_width="45dp"
         android:layout_height="36dp"
-        android:layout_marginBottom="675dp"
         android:background="@drawable/ic_bluetooth"
         android:backgroundTint="@color/bluetooth_selector"
         android:onClick="toggleHandle"
         android:textOff=""
 
         android:textOn=""
-        app:layout_constraintBottom_toBottomOf="@+id/nav_host_fragment"
 
+
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.956"
+        app:layout_constraintHorizontal_bias="0.95"
+
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/nav_host_fragment"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.164" />
 
     <Button
-        android:layout_width="wrap_content"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_height="40dp"
         android:id="@+id/loginMain"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
         android:background="@color/white"
         android:textColor="@color/green"
         android:textStyle="bold|italic"
@@ -69,22 +71,168 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/nav_host_fragment"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/test"
         android:layout_width="99dp"
         android:layout_height="21dp"
+        android:layout_marginTop="604dp"
         android:background="@color/green"
         android:text="@string/test"
-        app:layout_constraintBottom_toTopOf="@+id/nav_view"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/pollutionView"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:textAlignment="center"
+        android:textColor="@color/darkGreen"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/green"
+        app:layout_constraintBottom_toTopOf="@+id/pollutionView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.975" />
+        app:layout_constraintVertical_bias="0.831" />
 
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/homeInfo"
+        android:background="@drawable/info"
+        android:backgroundTint="@color/lightGreen"
+        app:layout_constraintBottom_toTopOf="@+id/imageView4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.834"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.893" />
 
+    <ImageView
+        android:id="@+id/co"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/co"
+        android:backgroundTint="@color/darkGreen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pollutionView"
+        app:layout_constraintHorizontal_bias="0.575"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="80dp"
+        android:layout_height="52dp"
+        android:backgroundTint="@color/darkGreen"
+        android:background="@drawable/ppm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.571"
+        app:layout_constraintStart_toEndOf="@+id/pollutionView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="41dp"
+        android:layout_height="46dp"
+        android:background="@drawable/celc"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="@color/darkGreen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.748"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.639" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/temp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/temperature"
+        android:backgroundTint="@color/darkGreen"
+        app:layout_constraintHorizontal_bias="0.483"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.64" />
+
+    <TextView
+        android:id="@+id/temperature"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/darkGreen"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+
+        app:layout_constraintHorizontal_bias="0.821"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.646" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/hum"
+        android:backgroundTint="@color/darkGreen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/humidity"
+        app:layout_constraintHorizontal_bias="0.566"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.763" />
+
+    <TextView
+        android:id="@+id/humidity"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/darkGreen"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.76" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="73dp"
+        android:layout_height="39dp"
+        android:background="@drawable/rh"
+        android:backgroundTint="@color/darkGreen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.371"
+        app:layout_constraintStart_toEndOf="@+id/humidity"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.755" />
 
     <TextView
         android:id="@+id/localisation"
@@ -92,11 +240,69 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/test"
         app:layout_constraintEnd_toEndOf="parent"
+
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.935" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/lightGreen"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/homeButton"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="start"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_home"
+            android:drawableTint="@color/blue"
+            android:gravity="center|bottom"
+            android:text="@string/home"
+            android:textAllCaps="false"
+            android:textColor="@color/blue"
+            app:elevation="@android:dimen/app_icon_size"
+
+            />
+
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_map"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/map"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_settings"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/settings"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size" />
+    </LinearLayout>
+<!--
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
         android:layout_width="match_parent"
@@ -111,6 +317,7 @@
         app:menu="@menu/bottom_menu"
         />
 
+
     <fragment
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -123,5 +330,5 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:navGraph="@navigation/app_navigation" />
+        app:navGraph="@navigation/app_navigation" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>

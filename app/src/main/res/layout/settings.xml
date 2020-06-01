@@ -7,6 +7,46 @@
     tools:context=".SettingsFragment">
 
     <TextView
+        android:id="@+id/loginView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:textColor="@color/green"
+        android:textStyle="italic|bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+        android:background="@drawable/help"
+        android:backgroundTint="@color/green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/loginMain"
+        app:layout_constraintTop_toTopOf="@+id/loginMain"
+        app:layout_constraintVertical_bias="0.008" />
+
+
+    <Button
+        android:id="@+id/loginMain"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:textColor="@color/green"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+    <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -68,10 +108,9 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
-        android:orientation="vertical"
         android:background="@color/gray"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -82,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/gray"/>
+            android:background="@color/gray" />
 
         <Button
             android:id="@+id/resetData"
@@ -99,7 +138,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/gray"/>
+            android:background="@color/gray" />
 
         <Button
             android:id="@+id/changePassword"
@@ -116,15 +155,15 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/gray"/>
+            android:background="@color/gray" />
 
         <TextView
             android:id="@+id/dbLink"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
             android:autoLink="all"
             android:background="@color/lightgray"
+            android:gravity="center"
             android:text="@string/dbLink"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -151,8 +190,8 @@
             android:id="@+id/version"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
             android:background="@color/lightgray"
+            android:gravity="center"
             android:text="@string/version_1_0"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -161,4 +200,60 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/lightGreen"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/homeButton"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="start"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_home"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/home"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size"
+
+            />
+
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_map"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/map"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_settings"
+            android:drawableTint="@color/blue"
+            android:gravity="center|bottom"
+            android:text="@string/settings"
+            android:textAllCaps="false"
+            android:textColor="@color/blue"
+            app:elevation="@android:dimen/app_icon_size" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean stopThread = false;
     private boolean connected = false;
     private LocationManager locationManager;
-    private Button login;
+    private Button login, map, settings;
     private TextView loginText;
     private FirebaseAuth auth;
     Location location = null;
@@ -93,33 +94,61 @@ private FirebaseFirestore mFirestore;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user!=null;
-     /*   Uri uri = user.getPhotoUrl();
-       ImageView img = findViewById(R.id.profile);
-        if(uri!=null)
-        {
-            Glide.with(this).load(uri).error(R.mipmap.ic_launcher)
-                    .placeholder(R.drawable.person)
-                    .into(img);
-            //Picasso.with(getContext()).load(uri.toString()).into(img);
-        }*/
         setup();
         db = new DatabaseHandler(this);
         ba = BluetoothAdapter.getDefaultAdapter();
         if(getFragmentRefreshListener()!= null){
             getFragmentRefreshListener().onRefresh();
         }
-
         bltOn();
         initFirestore();
         locationRequest();
-        navigationSetup();
         locationGetter();
         authView();
         handleLogin();
-       testButton();
+        testButton();
+        navigation();
+        showData();
+    }
+    public void showData()
+    {
+        if (db.checkDataPopulated()) {
+            Data d = db.getLast();
+            TextView text = findViewById(R.id.pollutionView);
+            text.setText(Integer.toString(d.getPollution()));
+            TextView temp = findViewById(R.id.temperature);
+            temp.setText(Integer.toString(db.getLastTH().getTemperature()));
+            TextView hum = findViewById(R.id.humidity);
+            hum.setText(Integer.toString(db.getLastTH().getHumidity()));
+        } else {
+            TextView text = findViewById(R.id.pollutionView);
+            text.setText("---");
+            TextView temp = findViewById(R.id.temperature);
+            temp.setText("---");
+            TextView hum = findViewById(R.id.humidity);
+            hum.setText("---");
+        }
+    }
+    public void navigation()
+    {
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
     }
     private void initFirestore() {
         mFirestore = FirebaseFirestore.getInstance();
@@ -145,15 +174,13 @@ private FirebaseFirestore mFirestore;
                     if(getFragmentRefreshListener()!= null){
                         getFragmentRefreshListener().onRefresh();
                     }
+                    showData();
                 }
-                else
-                {
+                else{
                     Toast.makeText(MainActivity.this, "Waiting for location", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
-
     }
     public void addDataToFirebase(Data data)
     {
@@ -166,7 +193,6 @@ private FirebaseFirestore mFirestore;
             addToFirebase("Co2", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
 
         }
-
     }
     public void addTHToFirebase(TempHum tempHum) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -182,7 +208,6 @@ private FirebaseFirestore mFirestore;
         doc.put("IdBiker", user);
         doc.put("Key", key);
         doc.put("TimeStamp", time);
-
         mFirestore.collection(dataType).document()
                 .set(doc)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -395,17 +420,10 @@ private FirebaseFirestore mFirestore;
             loginText.setText(currentUser.getEmail());
         }
     }
-    public void navigationSetup() {
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_map, R.id.navigation_settings)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
-    }
     public void setup()
     {
+        map = findViewById(R.id.mapButton);
+        settings = findViewById(R.id.settingsButton);
         text = findViewById(R.id.localisation);
         blt = (ToggleButton) findViewById(R.id.button_blt);
         login = findViewById(R.id.loginMain);
@@ -449,3 +467,13 @@ private FirebaseFirestore mFirestore;
         } else {
             text.setText("Location not available");
         }*/
+/*
+    public void navigationSetup() {
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_map, R.id.navigation_settings)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+    }*/

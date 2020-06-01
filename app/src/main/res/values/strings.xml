@@ -21,4 +21,7 @@
     <string name="forgot_password">Forgot password?</string>
     <string name="login">Sign In</string>
     <string name="do_you_really_want_to_delete_your_account_n_confirm_with_password">Do you really want to delete your account? \n Confirm with password</string>
+    <string name="map">Map</string>
+    <string name="home">Home</string>
+    <string name="settings">Settings</string>
 </resources>

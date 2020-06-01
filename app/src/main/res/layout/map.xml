@@ -8,16 +8,125 @@
     tools:context=".MapFragment">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="400dp"
-        android:padding="10dp"
-        android:text="@string/title_map"
+        android:id="@+id/loginView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:textColor="@color/green"
+        android:textStyle="italic|bold"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".MapFragment" />
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:background="@color/lightGreen"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintTop_toBottomOf="@+id/loginView"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-16dp" />
+
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="match-parent"
+        android:layout_height="511dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="70dp"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+        android:background="@drawable/help"
+        android:backgroundTint="@color/green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/loginMain"
+        app:layout_constraintTop_toTopOf="@+id/loginMain"
+        app:layout_constraintVertical_bias="0.008" />
+
+
+    <Button
+        android:id="@+id/loginMain"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:textColor="@color/green"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/lightGreen"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/homeButton"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="start"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_home"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/home"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size"
+
+            />
+
+        <Button
+            android:id="@+id/mapButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_map"
+            android:drawableTint="@color/blue"
+            android:gravity="center|bottom"
+            android:text="@string/map"
+            android:textAllCaps="false"
+            android:textColor="@color/blue"
+            app:elevation="@android:dimen/app_icon_size" />
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:backgroundTint="@color/lightGreen"
+            android:drawableTop="@drawable/ic_settings"
+            android:drawableTint="@color/white"
+            android:gravity="center|bottom"
+            android:text="@string/settings"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:elevation="@android:dimen/app_icon_size" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

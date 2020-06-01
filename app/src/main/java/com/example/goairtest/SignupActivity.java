@@ -36,10 +36,6 @@ public class SignupActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.signup);
-        db = new DatabaseHandler(this);
-        Data d = db.getLast();
-        TextView t = findViewById(R.id.testdb);
-        t.setText(Integer.toString(d.getPollution()));
 
 
         auth= FirebaseAuth.getInstance();
