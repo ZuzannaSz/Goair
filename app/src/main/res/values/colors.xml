@@ -12,4 +12,6 @@
     <color name="darkGreen">#243E16</color>
     <color name="lightblue">#DAF6FA</color>
     <color name="slategray">#628167</color>
+    <color name="yellow">#E4FFEB3B</color>
+    <color name="red">#C33851</color>
 </resources>

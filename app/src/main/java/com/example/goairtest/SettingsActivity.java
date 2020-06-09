@@ -131,6 +131,7 @@ public class SettingsActivity extends Activity {
             loginText.setText(currentUser.getEmail());
         }
     }
+
 }
 
      /*   Uri uri = user.getPhotoUrl();
