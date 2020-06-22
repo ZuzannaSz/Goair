@@ -1,23 +1,21 @@
 package com.example.goairtest;
 
 public class StringData {
-    private String longitude; //długość
-    private String latitude; //szerokość
+    private String longitude;
+    private String latitude;
     private String pollution;
     private int id;
     private String date;
     private String userId;
     public StringData(){}
-    public StringData(String userId, String longitude, String latitude, String pollution, String date)
-    {
+    public StringData(String userId, String longitude, String latitude, String pollution, String date) {
         this.userId=userId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.pollution = pollution;
         this.date = date;
     }
-    public StringData(int id, String userId, String longitude, String latitude, String pollution, String date)
-    {
+    public StringData(int id, String userId, String longitude, String latitude, String pollution, String date) {
         this.id=id;
         this.userId=userId;
         this.latitude = latitude;

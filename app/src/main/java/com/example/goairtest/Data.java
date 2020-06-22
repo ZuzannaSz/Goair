@@ -1,10 +1,9 @@
 package com.example.goairtest;
 
-import java.sql.Timestamp;
 
 public class Data {
-   private double longitude; //długość
-    private double latitude; //szerokość
+   private double longitude;
+   private double latitude;
     private double altitude;
     private int pollution;
     private int ID;
@@ -12,8 +11,7 @@ public class Data {
     private String update;
     private String userId;
     public Data(){}
-    public Data(int ID, double latitude, double longitude, double altitude, int pollution, String date, String update)
-    {
+    public Data(int ID, double latitude, double longitude, double altitude, int pollution, String date, String update) {
         this.ID =ID;
         this.latitude=latitude;
         this.longitude = longitude;
@@ -22,8 +20,7 @@ public class Data {
         this.date= date;
         this.update = update;
     }
-    public Data(double latitude, double longitude, double altitude, int pollution, String date, String update)
-    {
+    public Data(double latitude, double longitude, double altitude, int pollution, String date, String update) {
         this.latitude=latitude;
         this.longitude = longitude;
         this.altitude = altitude;
@@ -31,16 +28,14 @@ public class Data {
         this.date = date;
         this.update = update;
     }
-    public Data(String userId, double latitude, double longitude, int pollution, String date)
-    {
+    public Data(String userId, double latitude, double longitude, int pollution, String date) {
         this.latitude=latitude;
         this.longitude = longitude;
         this.pollution = pollution;
         this.date = date;
         this.userId =userId;
     }
-    public boolean dataCompare(Data a, Data b)
-    {
+    public boolean dataCompare(Data a, Data b) {
         return a.getLatitude() == b.getLatitude() && a.getLongitude() == b.getLongitude() && a.getAltitude() == b.getAltitude();
     }
 

@@ -15,8 +15,7 @@ public class ResetPasswordActivity extends Activity {
     private EditText email;
     private Button send;
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forgot_password);
         auth= FirebaseAuth.getInstance();
@@ -32,8 +31,7 @@ public class ResetPasswordActivity extends Activity {
         });
 
     }
-    public void recoverPassword()
-    {
+    public void recoverPassword() {
         String emailtxt;
         emailtxt = email.getText().toString();
         try {
@@ -41,8 +39,7 @@ public class ResetPasswordActivity extends Activity {
             Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
             startActivity(intent);
         }
-        catch (IllegalArgumentException e)
-        {
+        catch (IllegalArgumentException e) {
             Toast.makeText(ResetPasswordActivity.this, "Empty or incorrect email, please try again",
                     Toast.LENGTH_SHORT).show();
         }

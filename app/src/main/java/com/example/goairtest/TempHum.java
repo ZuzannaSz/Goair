@@ -9,16 +9,14 @@ public class TempHum {
     private String date;
     private String update;
     public  TempHum(){}
-    public TempHum(int id, int temperature, int humidity, String date, String update)
-    {
+    public TempHum(int id, int temperature, int humidity, String date, String update) {
         this.humidity=humidity;
         this.temperature = temperature;
         this.ID = id;
         this.date = date;
         this.update = update;
     }
-    public TempHum( int temperature, int humidity, String date, String update)
-    {
+    public TempHum( int temperature, int humidity, String date, String update) {
         this.temperature = temperature;
         this.humidity= humidity;
         this.date = date;

@@ -4,33 +4,33 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -44,25 +44,26 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
+
 
 import java.util.Set;
 
@@ -91,10 +92,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private  TextView text;
     private int pollutionTest = 400;
     private int pollutionMax = 499;
+    int pollution;
+    int THcounter;
     private ImageView logo;
     private String updated;
     private boolean clicked =false;
     Context context;
+    Context cont;
     private FragmentRefreshListener fragmentRefreshListener;
 private FirebaseFirestore mFirestore;
     @Override
@@ -102,6 +106,7 @@ private FirebaseFirestore mFirestore;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this.getBaseContext();
+        cont=this;
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user!=null;
         logo = findViewById(R.id.logo);
@@ -111,6 +116,8 @@ private FirebaseFirestore mFirestore;
         if(getFragmentRefreshListener()!= null){
             getFragmentRefreshListener().onRefresh();
         }
+        THcounter=0;
+        pollution=450;
         bltOn();
         initFirestore();
         locationRequest();
@@ -120,46 +127,68 @@ private FirebaseFirestore mFirestore;
         testButton();
         navigation();
         showData();
-        Button Red = findViewById(R.id.red);
-        Button Green = findViewById(R.id.green);
-        Button Yellow = findViewById(R.id.yellow);
-        Red.setOnClickListener(new View.OnClickListener() {
+        if(isNetworkAvailable(cont))
+        {
+            addAllToFirebase();
+        }
+        Button legend = findViewById(R.id.homeInfo);
+        legend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pollutionMax =2000;
-                pollutionTest = 700;
+                LayoutInflater li = LayoutInflater.from(cont);
+                View promptsView = li.inflate(R.layout.dialog_legend, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(cont);
+                alertDialogBuilder.setView(promptsView);
+                alertDialogBuilder.setCancelable(false)
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
-        Green.setOnClickListener(new View.OnClickListener() {
+
+
+
+
+        Button help = findViewById(R.id.home_help);
+        help.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pollutionTest=400;
-                pollutionMax=499;
-            }
-        });
-        Yellow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pollutionMax= 699;
-                pollutionTest = 500;
+                LayoutInflater li = LayoutInflater.from(cont);
+                View promptsView = li.inflate(R.layout.dialog_help, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(cont);
+                alertDialogBuilder.setView(promptsView);
+                alertDialogBuilder.setCancelable(false)
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
     }
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
     public void showData()
     {
-
         if (db.checkDataPopulated()) {
             Data d = db.getLast();
-            if(d.getPollution()<500)
-            {
+            if(d.getPollution()<500) {
                 logo.setColorFilter(logo.getContext().getResources().getColor(R.color.green), PorterDuff.Mode.SRC_ATOP);
             }
-            else if(d.getPollution()>=500 && d.getPollution()<700)
-            {
+            else if(d.getPollution()>=500 && d.getPollution()<700) {
                 logo.setColorFilter(logo.getContext().getResources().getColor(R.color.yellow), PorterDuff.Mode.SRC_ATOP);
             }
-            else
-            {
+            else {
                 logo.setColorFilter(logo.getContext().getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
             }
             TextView text = findViewById(R.id.pollutionView);
@@ -203,18 +232,17 @@ private FirebaseFirestore mFirestore;
     public void testButton() {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         b = findViewById(R.id.test);
-
         b .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(location!=null)
                 {
-                    Random r = new Random();
-
-                    int pollution = r.nextInt(pollutionMax-pollutionTest) + pollutionTest;
+                    //Random r = new Random();
+                  //  int pollution = r.nextInt(2000-400) + 400;
                     Data data2 = new Data(location.getLatitude(), location.getLongitude(),140,pollution, getDate(),"false");
                     TempHum th = new TempHum(25, 40,getDate(),"false");
                     db.addData(data2);
+                    pollution+=100;
                     db.addTH(th);
                     clicked = true;
                     data2 = db.getLast();
@@ -232,12 +260,31 @@ private FirebaseFirestore mFirestore;
             }
         });
     }
+    public void addAllToFirebase() {
+        List<Data> dataList = new ArrayList<>();
+        List<TempHum> thList = new ArrayList<>();
+        dataList=db.getAllData();
+        thList = db.getAllTH();
+        for(int i=0;i<dataList.size();i++) {
+            if(dataList.get(i).getUpdate().equals("false")) {
+                addDataToFirebase(dataList.get(i));
+                dataList.get(i).setUpdate("true");
+                db.updateData(dataList.get(i));
+            }
 
-    public void addDataToFirebase(Data data)
-    {
+        }
+        for(int j=0; j<thList.size();j++) {
+            if(thList.get(j).getUpdate().equals("false")) {
+                addTHToFirebase(thList.get(j));
+                thList.get(j).setUpdate("true");
+                db.updateTH(thList.get(j));
+            }
+
+        }
+    }
+    public void addDataToFirebase(Data data) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user!=null)
-        {
+        if(user!=null) {
             addToFirebase("Latitude", String.valueOf(data.getLatitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
             addToFirebase("Longitude", String.valueOf(data.getLongitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
             addToFirebase("Altitude", String.valueOf(data.getAltitude()), String.valueOf(data.getID()), user.getUid(),String.valueOf(data.getDate()));
@@ -252,8 +299,7 @@ private FirebaseFirestore mFirestore;
             addToFirebase("Humidity", String.valueOf(tempHum.getHumidity()), String.valueOf(tempHum.getID()), user.getUid(), String.valueOf(tempHum.getDate()));
         }
     }
-    public void addToFirebase(String dataType, String data, String key, String user, String time )
-    {
+    public void addToFirebase(String dataType, String data, String key, String user, String time ) {
         Map<String, Object> doc = new HashMap<>();
         doc.put(dataType, data);
         doc.put("IdBiker", user);
@@ -274,27 +320,21 @@ private FirebaseFirestore mFirestore;
                     }
                 });
     }
-    public void handleLogin()
-    {
-
+    public void handleLogin() {
         login.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
                 FirebaseUser currentUser = auth.getCurrentUser();
-                if(currentUser==null)
-                {
+                if(currentUser==null) {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
-                else
-                {
-                    //popup here asking if you want to log out
-                    AuthUI.getInstance().signOut(MainActivity.this)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                else {
+                    AuthUI.getInstance().signOut(MainActivity.this).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 public void onComplete(@NonNull Task<Void> task) {
-                                  //  Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
                                     login.setText("Login");
                                     loginText.setText("");
                                 }
@@ -309,7 +349,6 @@ private FirebaseFirestore mFirestore;
     @Override
     public void onLocationChanged(Location location) {
         this.location =location;
-        text.setText("location coordinates: " + location.getLatitude() + " " + location.getLongitude());
     }
 
     public void locationOn()
@@ -317,12 +356,12 @@ private FirebaseFirestore mFirestore;
     LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationOn = service
             .isProviderEnabled(LocationManager.GPS_PROVIDER);
-    if (!locationOn) {
+        if (!locationOn) {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(intent);
+        }
     }
-}    public void locationGetter()
-    {
+    public void locationGetter() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -345,7 +384,12 @@ private FirebaseFirestore mFirestore;
                             final String string = new String(rawBytes, StandardCharsets.UTF_8);
                             handler.post(new Runnable() {
                                 public void run() {
-                                    saveData(string);
+                                    if(location!=null)
+                                    {
+                                        saveData(string);
+                                        THcounter++;
+                                    }
+
                                 }
                             });
                         }
@@ -362,25 +406,18 @@ private FirebaseFirestore mFirestore;
     {
         String[] rawData = string.split(" ");
         //get current localisation
-        //Data data = new Data(location.getLatitude(), location.getLongitude(),location.getAltitude(), Integer.parseInt(rawData[0]));
-
-       // int id = db.getId(data);
-       /* if(id !=-1)
-        {
-         //   int i = db.updateData(id,location.getLatitude(),location.getLongitude(), Integer.parseInt(rawData[0]));
-            Log.d("exist", "data exists and got updated " + id);
-            if(getFragmentRefreshListener()!= null){
-                getFragmentRefreshListener().onRefresh();
-            }
+        String date = getDate();
+        Data data = new Data(location.getLatitude(), location.getLongitude(),location.getAltitude(), Integer.parseInt(rawData[0]),date,"false");
+        db.addData(data);
+        if(getFragmentRefreshListener()!= null){
+            getFragmentRefreshListener().onRefresh();
         }
-        else
+        if(THcounter>24)
         {
-            db.addData(data);
-            if(getFragmentRefreshListener()!= null){
-                getFragmentRefreshListener().onRefresh();
-            }
-            Log.d("exist", "data doesn't exist");
-        }*/
+            TempHum tempHum = new TempHum(Integer.parseInt(rawData[1]), Integer.parseInt(rawData[2]),date,"false");
+            THcounter=0;
+        }
+
     }
     public void bltConnect() throws IOException {
         Set<BluetoothDevice> devices = ba.getBondedDevices();
@@ -443,14 +480,17 @@ private FirebaseFirestore mFirestore;
             }
             if(!connected) {
                 ((ToggleButton) view).setChecked(false);
-            } } else {
+            }
+        }
+        else {
             try{
                 bltDisconnect();
             }
             catch (IOException e) {
                 ((ToggleButton) view).setChecked(true);
                 e.printStackTrace();
-            } }
+            }
+        }
     }
     void bltDisconnect() throws IOException {
         if(connected) {
@@ -472,8 +512,7 @@ private FirebaseFirestore mFirestore;
             loginText.setText(currentUser.getEmail());
         }
     }
-    public void setup()
-    {
+    public void setup() {
         map = findViewById(R.id.mapButton);
         settings = findViewById(R.id.settingsButton);
         text = findViewById(R.id.localisation);
@@ -529,3 +568,27 @@ private FirebaseFirestore mFirestore;
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }*/
+//Button Red = findViewById(R.id.red);
+// Button Green = findViewById(R.id.green);
+//Button Yellow = findViewById(R.id.yellow);
+       /* Red.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pollutionMax =2000;
+                pollutionTest = 700;
+            }
+        });
+        Green.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pollutionTest=400;
+                pollutionMax=499;
+            }
+        });
+        Yellow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pollutionMax= 699;
+                pollutionTest = 500;
+            }
+        });*/

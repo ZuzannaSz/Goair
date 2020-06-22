@@ -19,7 +19,6 @@ public class Routing {
     private Node begin;
     private int iteration;
     private List<Node> subNodes;
-    private Path path;
     private double maxLength;
 
     public Routing() {
@@ -35,326 +34,98 @@ public class Routing {
         this.start = start;
         this.end = end;
         this.iteration = 0;
-        maxLength = 3 * distanceCalculator(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
+
+        maxLength = 2 * distanceCalculator(start.getLatitude(), start.getLongitude(), end.getLatitude(), end.getLongitude());
         subNodes = new ArrayList<>();
         paths = new ArrayList<>();
-
     }
 
     public void mainRouting() {
         begin = new Node();
-        begin = closestPoint(closestNode(this.start), this.start);
+        begin = closestNode(this.start);
         dest = new Node();
-        dest = closestPoint(closestNode(this.end), this.end);
+        dest = closestNode(this.end);
+        Log.i("DESTINATION", "IS " + dest.getLatitude() +" "+ dest.getLongitude());
+        Log.i("START", "IS " + begin.getLatitude() + " "+ begin.getLongitude());
         nodes.add(begin);
         nodes.add(dest);
         Edge newEdge = new Edge();
         Node newNode = new Node();
         List<Node> visited = new ArrayList<>();
         Path route = new Path();
-        visited.add(begin);
         route.getNodes().add(begin);
-        for (int i = 0; i < begin.getEdges().size(); i++) {
-            newEdge = begin.getEdges().get(i);
-            newNode = getNextNode(begin, newEdge);
-            newEdge.setChecked(true);
-            int index = getEdgeIndex(newNode, newEdge);
-            if (!nodeChecked(newNode, visited)) {
-                if (newNode.getLatitude() > 90 && newNode.getLongitude() > 180) {
-                    Log.i("NODE", "Empty");
-                } else {
-                    if (index != -1) {
-                        newNode.getEdges().set(index, newEdge);
-                    }
-                    newPath(newNode, newEdge, visited, route);
-                }
-            }
-        }
+        newPath(begin, visited, route);
     }
-
-    public boolean newPath(Node node, Edge edge, List<Node> visited, Path route)
-    {
-        int iterations =0;
-        if(node.isEqual(dest)) {
-            route.getNodes().add(node);
-            paths.add(route);
-            route=new Path();
-            return true;
+    public void newPath(Node node, List<Node> visited, Path route) {
+        visited.add(node);
+        if(dest.isEqual(node)) {
+            if(route.getPollution()>0) {
+                route.setPollution(route.getPollution()/route.getPollutedL());
+            }
+          paths.add(new Path(route.getNodes()));
+          visited.remove(node);
+          return;
         }
-        for(int i=0; i<node.getEdges().size();i++) {
-            iterations++;
-            List<Node> nodeTemp = new ArrayList<>(visited);
-            nodeTemp.add(node);
-            Path routeTemp = new Path();
-           // routeTemp = route;
-           // routeTemp.getNodes().add(node);
-            Edge newEdge = new Edge();
-            Node newNode = new Node();
-            if(!node.getEdges().get(i).isChecked()) {
+        if(node.getLongitude()<=180 && paths.size()<20 && route.getLength()<maxLength) {
+            for(int i=0; i<node.getEdges().size();i++) {
+                Edge newEdge = new Edge();
+                Node newNode = new Node();
+                List<Node> newNodes = new ArrayList<>();
                 newEdge = node.getEdges().get(i);
-                newNode = getNextNode(node,newEdge);
-                newEdge.setChecked(true);
-                int in= getEdgeIndex(node,newEdge);
-                node.getEdges().add(in, edge);
-                if(newNode.getLatitude()>90 && newNode.getLongitude() >180) {
-                    Log.i("NODE", "Empty node");
-                    return false;
-                }
-                else {
-
-                    int index= getEdgeIndex(newNode,newEdge);
-                    if(!nodeChecked(newNode,visited)) {
-                        if(index!=-1) {
-                            newNode.getEdges().set(index, newEdge);
-                            Log.i("NODE", "CHECKING NEW NODE" +newEdge.getIndex());
-                            if(newPath(newNode,newEdge,nodeTemp,route))
-                            {
-                                route.getNodes().add(node);
-                                return true;
-                            }
+                newNodes = getNextNode(node, newEdge);
+                for(int j=0; j<newNodes.size();j++) {
+                    newNode = newNodes.get(j);
+                    if (!visited(newNode, visited)) {
+                        int pollution = getPollution(node, newNode, newEdge);
+                        if (pollution != 0) {
+                            route.setPollution(route.getPollution() + pollution);
+                            route.setPollutedL(route.getPollutedL() + 1);
+                        }
+                        route.getNodes().add(newNode);
+                        route.setLength(route.getLength() + newEdge.getDistance());
+                        newPath(newNode, visited, route);
+                        route.getNodes().remove(newNode);
+                        route.setLength(route.getLength() - newEdge.getDistance());
+                        if (pollution != 0) {
+                            route.setPollution(route.getPollution() - pollution);
+                            route.setPollutedL(route.getPollutedL() - 1);
                         }
                     }
                 }
             }
         }
-        if(iterations==0)
-        {
-            Log.i("BACK", "BACKTRACK --------------------------");
-            route.getNodes().remove(node);
-            visited.add(node);
-            int ind = route.getNodes().size()-1;
-            newPath(route.getNodes().get(ind-1), edge, visited,route);
-        }
-        return false;
+        visited.remove(node);
     }
-    public void getPath(Node node, Edge edge)
-    {
-        Node prev = new Node();
-        int index=0;
-        iteration++;
-        Log.i("ITERATION", "ITERATION NO" + iteration);
-        Log.i("NODE ", "NODE " + node.getLatitude() + " " + node.getLongitude());
-        if(path!=null) {
-            if(path.getNodes().size()>1) {
-                index = path.getNodes().size()-1;
-                prev = path.getNodes().get(index-1);
-            }
-        }
-        Edge newEdge = new Edge();
-        if(node.getLatitude()>90 && node.getLongitude() >180)
-        {
-            path.getNodes().remove(node);
-            path.getEdges().remove(edge);
-            path.setPollution(path.getPollution()-edge.getPolution());
-            path.setLength(path.getLength()-edge.getDistance());
-            if(edge.getPolution()!=0)
-            {
-                path.setPollutedL(path.getPollutedL()-edge.getDistance());
-            }
-            Node prevNode= path.getNodes().get(index-1);
-            prevNode.getEdges().remove(edge);
-            updateNode(prevNode);
-            getPath(prevNode,edge);
-            return;
-        }
-        setEdgeUsed(edge);
-        int i=getEdgeIndex(node,edge);
-        node.getEdges().get(i).setChecked(true);
-        updateNode(node);
-       if(isEdge(node))
-       {
-           newEdge = getNewEdge(node);
-       }
-        if(node.isEqual(begin))
-        {
-            index = path.getNodes().size()-1;
-            if(index==0) {
-            //    edge = getNewEdge(begin);
-            //    prev = getNextNode(begin, newEdge);
-                return;
-            }
-            path.setPollutedL(0);
-            path.setPollution(0);
-            path.setLength(0);
-            path.getEdges().clear();
-            path.getNodes().clear();
-            path.getNodes().add(node);
-            path.getNodes().add(prev);
-            path.getEdges().add(edge);
-            path.setPollution(edge.getPolution());
-            if(edge.getPolution()>0)
-            {
-                path.setPollutedL(edge.getDistance());
-            }
-            path.setLength(edge.getDistance());
-            Log.i("NODE", "IS EQUAL TO START");
-            Log.i("PREV", "GO TO PREVIOUS  NODE--------------------------------");
-            getPath(prev, edge);
-        }
-        else if(path.getLength()>maxLength)
-        {
-            nodes.remove(node);
-            path=new Path();
-            path.getNodes().add(begin);
-            newEdge = getNewEdge(begin);
-            newEdge.setChecked(true);
-            int ind= getEdgeIndex(begin, newEdge);
-            begin.getEdges().add(ind,newEdge);
-            updateNode(begin);
-            prev=getNextNode(begin,newEdge);
-            path.getNodes().add(prev);
-            path.getEdges().add(newEdge);
-                       Log.i("DISTANCE", "DISTANCE TOO BIG");
-            Log.i("PREV", "GO TO PREVIOUS  NODE--------------------------------");
-            getPath(prev,newEdge);
-        }
-        else if(node.isEqual(dest))
-        {
-            node.setVisited(node.getVisited()+1);
-            if(getEdgeNo(node)-1==node.getVisited())
-            {
-                resetEdgeUsed(node);
-                node.setVisited(0);
-            }
-           // path.getNodes().add(node);
-            paths.add(path);
-            path.getNodes().remove(node);
-            path.getEdges().remove(edge);
-            path.setPollution(path.getPollution()-edge.getPolution());
-            path.setLength(path.getLength()-edge.getDistance());
-            if(edge.getPolution()!=0)
-            {
-                path.setPollutedL(path.getPollutedL()-edge.getDistance());
-            }
-            if(checkIfPathExists(path))
-            {
-                return;
-            }
-            updateNode(node);
-            Log.i("DESTINATION", "IS EQUAL TO END");
-            Log.i("PREV", "GO TO PREVIOUS  NODE--------------------------------");
-            Node prevNode= path.getNodes().get(index);
-            getPath(prevNode,edge);
-        }
-        else if(!isEdge(node)) {
-            node.setVisited(node.getVisited()+1);
-            if(getEdgeNo(node)!=0)
-            {
-                if(getEdgeNo(node)-1==node.getVisited()%getEdgeNo(node))
-                {
-                    resetEdgeUsed(node);
-                   // Log.i("RESET", "RESET USED");
-                }
-            }
-            path.getNodes().remove(node);
-            path.getEdges().remove(edge);
-            path.setPollution(path.getPollution()-edge.getPolution());
-            path.setLength(path.getLength()-edge.getDistance());
-            if(edge.getPolution()!=0)
-            {
-                path.setPollutedL(path.getPollutedL()-edge.getDistance());
-            }
-            updateNode(node);
-            Node prevNode= path.getNodes().get(index-1);
-           // Log.i("NODE", "THERE ARE NO NODES LEFT BITCH WE TURNIN BACK");
-          //  Log.i("PREV", "GO TO PREVIOUS  NODE--------------------------------");
-            getPath(prevNode,edge);
-        }
-        else {
-            //new edge
-            node.setVisited(node.getVisited()+1);
-            if(getEdgeNo(node)-1==node.getVisited())
-            {
-                resetEdgeUsed(node);
-                node.setVisited(0);
-
-            }
-
-            updateNode(node);
-            newEdge.setPolution(getPollution(node,prev,newEdge));
-            Node next =new Node();
-            next = getNextNode(node, newEdge);
-            path.getNodes().add(next);
-            path.getEdges().add(newEdge);
-            //NO VISITING THE SAME NODE TWICE IN ONE PATH!
-            path.setLength(path.getLength()+newEdge.getDistance());
-            path.setPollution(path.getPollution()+newEdge.getPolution());
-            if(newEdge.getPolution()!=0)
-            {
-                path.setPollutedL(path.getPollutedL()+newEdge.getDistance());
-            }
-            //this one works
-            //Log.i("ELSE", "WE'RE IN THE ZONE");
-            //Log.i("EDGE", "NEW EDGE" + newEdge.getIndex());
-           // Log.i("NEXT NODE", "NODE" + next.getLatitude() + next.getLongitude() +" " + next.getEdges().get(0).getIndex());
-
-            getPath(next, newEdge);
-        }
-    }
-
-    public int getEdgeIndex(Node node,Edge edge) {
-        int index=-1;
-        for(int i=0;i<node.getEdges().size();i++) {
-            if(node.getEdges().get(i).isEqual(edge)) {
-                index=i;
-            }
-        }
-        return index;
-    }
-
-    public int getNodeIndex(Node node) {
-        int index=-1;
-        for(int i=0;i<nodes.size();i++) {
-            if(nodes.get(i).isEqual(node)) {
-                index=i;
-                break;
-            }
-        }
-        return index;
-    }
-
-    public void updateNode(Node node) {
-        for(int i=0; i<nodes.size();i++) {
-            if(nodes.get(i).getLatitude()==node.getLatitude() && nodes.get(i).getLongitude() == node.getLongitude()) {
-                nodes.get(i).setEdges(node.getEdges());
-                nodes.get(i).setVisited(node.getVisited());
-            }
-        }
-    }
-
-    public void resetEdgeUsed(Node node) {
-        for(int i=0; i<node.getEdges().size();i++) {
-            node.getEdges().get(i).setChecked(false);
-        }
-        updateNode(node);
-    }
-    public boolean nodeChecked(Node node, List<Node> nodes)
-    {
-        for(int i=0; i<nodes.size();i++)
-        {
-            if(nodes.get(i).isEqual(node))
-            {
+    public boolean visited(Node node, List<Node> visited) {
+        for(int i=0; i<visited.size();i++) {
+            if(visited.get(i).isEqual(node)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Node getNextNode(Node node, Edge edge) {
+    public List<Node> getNextNode(Node node, Edge edge) {
         Node newNode = new Node();
+        List<Node> temp = new ArrayList<>();
         newNode.setLongitude(200);
         newNode.setLatitude(100);
+        boolean added =false;
         for(int i=0;i<nodes.size();i++) {
-            if(nodes.get(i)!=node) {
+            if(!nodes.get(i).isEqual(node)) {
                 for(int j=0; j<nodes.get(i).getEdges().size();j++) {
                     if(nodes.get(i).getEdges().get(j).getIndex()==edge.getIndex()) {
                         newNode =nodes.get(i);
-                        break;
-                    }
+                        temp.add(newNode);
+                        added =true;
+                        }
                 }
             }
         }
-        return  newNode;
+        if(!added) {
+            temp.add(newNode);
+        }
+        return  temp;
     }
 
     public int getEdgeNo(Node node) {
@@ -363,36 +134,6 @@ public class Routing {
             count++;
         }
         return count;
-    }
-
-    public Edge getNewEdge(Node node) {
-        Edge edge = new Edge();
-        for(int i=0;i<node.getEdges().size();i++) {
-            if(!node.getEdges().get(i).isChecked()) {
-                edge =node.getEdges().get(i);
-            }
-        }
-        return  edge;
-    }
-
-    public void setEdgeUsed(Edge edge) {
-        for(int i=0;i<nodes.size();i++) {
-            for(int j=0; j<nodes.get(i).getEdges().size();j++) {
-                if(nodes.get(i).getEdges().get(j).getIndex() == edge.getIndex()) {
-                    nodes.get(i).getEdges().get(j).setChecked(true);
-                }
-            }
-        }
-    }
-
-    public boolean checkIfPathExists(Path path) {
-        for(int i=0;i<paths.size();i++)
-        {
-            if(path.isEqual(paths.get(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public int getPollution(Node a, Node b, Edge e) {
@@ -407,12 +148,10 @@ public class Routing {
                 counter++;
             }
         }
-        if(pollution!=0)
-        {
+        if(pollution!=0) {
             result = pollution/counter;
         }
-        else
-        {
+        else {
             result = 0;
         }
         return result;
@@ -421,8 +160,7 @@ public class Routing {
     public void getSubNodes(Node a, Node b, int length) {
         Node subNode =new Node();
         int l= length/2;
-        if(l>MIN_LENGTH)
-        {
+        if(l>MIN_LENGTH) {
             subNode.setLongitude((a.getLongitude()+b.getLongitude())/2);
             subNode.setLatitude((a.getLatitude()+b.getLatitude())/2);
             subNode.setPollution(getSubNodePollution(subNode));
@@ -444,24 +182,13 @@ public class Routing {
                 counter++;
             }
         }
-        if(pollution!=0)
-        {
+        if(pollution!=0) {
             result = pollution/counter;
         }
-        else
-        {
+        else {
             result = 0;
         }
         return result;
-    }
-
-    public boolean isEdge(Node node) {
-        for(int i=0; i<node.getEdges().size();i++) {
-            if(!node.getEdges().get(i).isChecked()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public Node closestNode(GeoPoint point) {
@@ -471,12 +198,10 @@ public class Routing {
         for (int i=0;i<nodes.size();i++) {
             temp = distanceCalculator(point.getLatitude(),point.getLongitude(), nodes.get(i).getLatitude(), nodes.get(i).getLongitude());
             if(temp<distance) {
-                closest= new Node();
-                closest = nodes.get(i);
+                closest= new Node(nodes.get(i));
                 distance = temp;
             }
         }
-        //Log.i("PARSE NODES", "edge " +closest.getLatitude()+ + closest.getLongitude() +" added" );
         return closest;
     }
 
@@ -495,7 +220,6 @@ public class Routing {
 
             temp.add(m);
         }
-       // Log.i("Node primary", "Node"+node.getLatitude() + node.getLongitude());
         for (int i=0;i<temp.size();i++) {
             curD =(int)distanceCalculator(node.getLatitude(),node.getLongitude(), temp.get(i).getLatitude(),temp.get(i).getLongitude());
 
@@ -509,14 +233,12 @@ public class Routing {
             }
             prevD = curD;
         }
-       // Log.i("Node second closest", "second closest" + t.getLatitude() + t.getLongitude());
         double a1 =  (t.getLongitude()-node.getLongitude())/(t.getLatitude()-node.getLatitude());
         double a2= -(1/a1);
         double temp1 = a2*point.getLatitude();
         double temp2 = a1*node.getLatitude();
         double x= (-(temp1)+(temp2)+point.getLongitude()-node.getLongitude())/(a1-a2);
         double y = a2*x - a2*point.getLatitude() + point.getLongitude();
-       // Log.i("NODES", "-------------new Node:" + x+" " + y +" " + a1 +" " + a2);
         int e1 = (int)distanceCalculator(x,y,node.getLatitude(),node.getLongitude());
         int e2 = (int)distanceCalculator(x,y,t.getLatitude(),t.getLongitude());
         Edge edge1 = new Edge(edgeIndex()+1,e1);
@@ -564,17 +286,25 @@ public class Routing {
 
         return next;
     }
-
-
-
-
-
-
-
-
-
-
-
+    public double distanceCalculator(double la1, double lo1, double la2, double lo2) {
+        double d;
+        if(la1==la2 && lo1==lo2) {
+            d=0;
+        }
+        else {
+            la1 = la1/(180/Math.PI);
+            la2= la2/(180/Math.PI);
+            lo1 = lo1/(180/Math.PI);
+            lo2= lo2/(180/Math.PI);
+            double dlong = lo2 - lo1;
+            double dlat = la2 - la1;
+            d = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(la1) * Math.cos(la2) * Math.pow(Math.sin(dlong / 2), 2);
+            d = 2 * Math.asin(Math.sqrt(d));
+            double R = 6371;
+            d = d * R*1000 *100;
+        }
+        return d;
+    }
     public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
     }
@@ -586,32 +316,6 @@ public class Routing {
     }
     public List<Data> getData() {
         return data;
-    }
-    public double distanceCalculator(double la1, double lo1, double la2, double lo2)
-    {
-        double d;
-        if(la1==la2 && lo1==lo2)
-        {
-            d=0;
-        }
-        else
-        {
-            la1 = la1/(180/Math.PI);
-            la2= la2/(180/Math.PI);
-            lo1 = lo1/(180/Math.PI);
-            lo2= lo2/(180/Math.PI);
-            double dlong = lo2 - lo1;
-            double dlat = la2 - la1;
-
-            d = Math.pow(Math.sin(dlat / 2), 2) +
-                Math.cos(la1) * Math.cos(la2) *
-                        Math.pow(Math.sin(dlong / 2), 2);
-
-            d = 2 * Math.asin(Math.sqrt(d));
-            double R = 6371;
-            d = d * R*1000 *100;
-        }
-        return d;
     }
     public GeoPoint getEnd() {
         return end;
@@ -645,6 +349,96 @@ public class Routing {
         this.subNodes = subNodes;
     }
 }
+/*
+
+
+
+    public void resetEdgeUsed(Node node) {
+        for(int i=0; i<node.getEdges().size();i++) {
+            node.getEdges().get(i).setChecked(false);
+        }
+        updateNode(node);
+    }
+    public boolean nodeChecked(Node node, List<Node> nodes)
+    {
+        for(int i=0; i<nodes.size();i++)
+        {
+            if(nodes.get(i).isEqual(node))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Edge getNewEdge(Node node) {
+        Edge edge = new Edge();
+        for(int i=0;i<node.getEdges().size();i++) {
+            if(!node.getEdges().get(i).isChecked()) {
+                edge =node.getEdges().get(i);
+            }
+        }
+        return  edge;
+    }
+
+    public void setEdgeUsed(Edge edge) {
+        for(int i=0;i<nodes.size();i++) {
+            for(int j=0; j<nodes.get(i).getEdges().size();j++) {
+                if(nodes.get(i).getEdges().get(j).getIndex() == edge.getIndex()) {
+                    nodes.get(i).getEdges().get(j).setChecked(true);
+                }
+            }
+        }
+    }
+
+    public boolean checkIfPathExists(Path path) {
+        for(int i=0;i<paths.size();i++)
+        {
+            if(path.isEqual(paths.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+ public int getEdgeIndex(Node node,Edge edge) {
+        int index=-1;
+        for(int i=0;i<node.getEdges().size();i++) {
+            if(node.getEdges().get(i).isEqual(edge)) {
+                index=i;
+            }
+        }
+        return index;
+    }
+
+    public int getNodeIndex(Node node) {
+        int index=-1;
+        for(int i=0;i<nodes.size();i++) {
+            if(nodes.get(i).isEqual(node)) {
+                index=i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public void updateNode(Node node) {
+        for(int i=0; i<nodes.size();i++) {
+            if(nodes.get(i).getLatitude()==node.getLatitude() && nodes.get(i).getLongitude() == node.getLongitude()) {
+                nodes.get(i).setEdges(node.getEdges());
+                nodes.get(i).setVisited(node.getVisited());
+            }
+        }
+    }
+    public boolean isEdge(Node node) {
+        for(int i=0; i<node.getEdges().size();i++) {
+            if(!node.getEdges().get(i).isChecked()) {
+                return true;
+            }
+        }
+        return false;
+    }
+ */
       /*  this.path = new Path();
         Edge newEdge = getNewEdge(begin);
         newEdge.setChecked(true);

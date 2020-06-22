@@ -34,10 +34,7 @@ public class SignupActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.signup);
-
-
         auth= FirebaseAuth.getInstance();
         email=findViewById(R.id.signupmail);
         password = findViewById(R.id.signuppassword);
@@ -52,8 +49,7 @@ public class SignupActivity extends Activity {
             }
         });
     }
-    public void createUser()
-    {
+    public void createUser() {
         String emailtxt, passwordtxt;
         emailtxt = email.getText().toString();
         passwordtxt = password.getText().toString();
@@ -65,8 +61,7 @@ public class SignupActivity extends Activity {
             Toast.makeText(getApplicationContext(), "Please enter password!", Toast.LENGTH_LONG).show();
             return;
         }
-        auth.createUserWithEmailAndPassword(emailtxt, passwordtxt)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        auth.createUserWithEmailAndPassword(emailtxt, passwordtxt).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @SuppressLint("RestrictedApi")
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -78,23 +73,20 @@ public class SignupActivity extends Activity {
                             startActivity(intent);
 
                         } else {
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignupActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignupActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 });
     }
-    public void toggleHandle(View view)
-    {
+    public void toggleHandle(View view) {
         boolean on = ((ToggleButton) view).isChecked();
-
         if (on) {
             password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
 
-        } else {
+        }
+        else {
             password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }

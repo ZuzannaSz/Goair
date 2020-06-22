@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Utils {
-    static String getJson(Context context, String file)
-    {
+    static String getJson(Context context, String file) {
         String myString;
         try{
             InputStream stream= context.getAssets().open(file);
@@ -17,8 +16,7 @@ public class Utils {
             stream.close();
             myString = new String(buff, "UTF-8");
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
             return null;
         }

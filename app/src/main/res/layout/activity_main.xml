@@ -8,7 +8,7 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
-    <Button
+ <!--   <Button
         android:id="@+id/green"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -49,7 +49,7 @@
         app:layout_constraintHorizontal_bias="0.102"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/yellow"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0" />-->
 
     <TextView
         android:id="@+id/loginView"
@@ -70,7 +70,7 @@
     <Button
         android:layout_width="30dp"
         android:layout_height="30dp"
-
+         android:id="@+id/home_help"
         android:background="@drawable/help"
         android:backgroundTint="@color/green"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -119,15 +119,16 @@
     <Button
         android:id="@+id/test"
         android:layout_width="99dp"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_height="21dp"
-        android:layout_marginTop="604dp"
-        android:background="@color/green"
+        android:background="@color/white"
         android:text="@string/test"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/humidity"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -156,10 +157,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.831" />
 
-    <ImageView
+    <Button
+        android:id="@+id/homeInfo"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:id="@+id/homeInfo"
         android:background="@drawable/info"
         android:backgroundTint="@color/lightGreen"
         app:layout_constraintBottom_toTopOf="@+id/imageView4"
@@ -167,7 +168,7 @@
         app:layout_constraintHorizontal_bias="0.834"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.893" />
+        app:layout_constraintVertical_bias="0.368" />
 
     <ImageView
         android:id="@+id/co"

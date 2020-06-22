@@ -20,7 +20,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.IOException;
 
 import static com.firebase.ui.auth.AuthUI.TAG;
 
@@ -29,8 +28,7 @@ public class LoginActivity extends Activity {
     private EditText email, password;
     private Button login, signup, recover;
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         auth= FirebaseAuth.getInstance();
@@ -48,7 +46,6 @@ public class LoginActivity extends Activity {
                 userLogin();
             }
         });
-
         signup.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -68,41 +65,34 @@ public class LoginActivity extends Activity {
             }
         });
     }
-    public void userLogin()
-    {
+    public void userLogin() {
         String emailtxt, passwordtxt;
         emailtxt = email.getText().toString();
         passwordtxt= password.getText().toString();
-        auth.signInWithEmailAndPassword(emailtxt,passwordtxt)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(emailtxt,passwordtxt).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @SuppressLint("RestrictedApi")
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Login successfull",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Login successfull", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
                         }
-
+                        else {
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                });
+        });
 
     }
-    public void toggleHandle(View view)
-    {
+    public void toggleHandle(View view) {
         boolean on = ((ToggleButton) view).isChecked();
-
         if (on) {
             password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
 
-        } else {
+        }
+        else {
              password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
     }

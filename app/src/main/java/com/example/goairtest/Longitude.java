@@ -6,8 +6,7 @@ public class Longitude {
     private String Longitude;
     private String TimeStamp;
     public Longitude(){}
-    public Longitude(String IdBiker, String Key, String Longitude, String TimeStamp)
-    {
+    public Longitude(String IdBiker, String Key, String Longitude, String TimeStamp) {
         this.IdBiker=IdBiker;
         this.Key=Key;
         this.Longitude = Longitude;

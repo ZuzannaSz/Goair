@@ -10,21 +10,22 @@ public class Node {
     private int visited;
     private List<Edge> edges;
 
-    public Node()
-    {
+    public Node() {    }
+    public Node(Node node) {
+        this.latitude=node.getLatitude();
+        this.longitude=node.getLongitude();
+        this.edges= new ArrayList<>();
+        this.edges.addAll(node.getEdges());
     }
-    public Node(double latitude, double longitude, ArrayList<Edge> edges)
-    {
+    public Node(double latitude, double longitude, ArrayList<Edge> edges) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.edges = new ArrayList<>();
         this.edges.addAll(edges);
         this.visited =0;
     }
-    public boolean isEqual(Node a)
-    {
-        if(this.getLongitude()==a.getLongitude() && this.getLatitude()==a.getLatitude())
-        {
+    public boolean isEqual(Node a) {
+        if(this.getLongitude()==a.getLongitude() && this.getLatitude()==a.getLatitude()) {
             return true;
         }
         return false;

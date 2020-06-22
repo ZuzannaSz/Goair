@@ -2,16 +2,12 @@ package com.example.goairtest;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -25,13 +21,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -39,15 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.firebase.ui.auth.AuthUI.TAG;
 
 public class EditProfileActivity extends Activity {
     int GET_IMAGE = 123;
@@ -57,10 +42,9 @@ public class EditProfileActivity extends Activity {
     private EditText username, password;
     private Button upload, delete, passwd;
     private  FirebaseUser user;
-    private FirebaseFirestore mFirestore;
+
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_profile);
@@ -68,17 +52,15 @@ public class EditProfileActivity extends Activity {
         assert user != null;
         Uri uri = user.getPhotoUrl();
         img = findViewById(R.id.profile);
-        if(uri!=null)
-        {
+        if(uri!=null) {
             Glide.with(this).load(uri).into(img);
         }
-
         username = findViewById(R.id.usernameEdit);
         username.setText(user.getDisplayName());
         upload = findViewById(R.id.sendUpdate);
         delete = findViewById(R.id.delete);
         passwd= findViewById(R.id.changePassword);
-       upload.setOnClickListener(new View.OnClickListener() {
+        upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 uploadData();
@@ -104,40 +86,31 @@ public class EditProfileActivity extends Activity {
         View promptsView = li.inflate(R.layout.dialog_password, null);
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
-        // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
 
-        final EditText oldPass = promptsView
-                .findViewById(R.id.oldPassword);
+        final EditText oldPass = promptsView.findViewById(R.id.oldPassword);
         final EditText newPass = promptsView.findViewById(R.id.newPassword);
-        // set dialog message
         newPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
         oldPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
-       final ToggleButton see = promptsView.findViewById(R.id.showlogin);
+        final ToggleButton see = promptsView.findViewById(R.id.showlogin);
         see.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean on = see.isChecked();
-
                 if (on) {
                     newPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                     oldPass.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
 
-                } else {
+                }
+                else {
                     newPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
                     oldPass.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
             }
         });
 
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
                                 String oldPassword = oldPass.getText().toString();
                                 String newPassword = newPass.getText().toString();
                                 user = FirebaseAuth.getInstance().getCurrentUser();
@@ -145,16 +118,14 @@ public class EditProfileActivity extends Activity {
                                 AuthCredential credential = EmailAuthProvider
                                         .getCredential(user.getEmail(), oldPassword);
 
-                                user.reauthenticate(credential)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 Log.d("TAG", "User re-authenticated.");
                                             }
                                         });
 
-                                user.updatePassword(newPassword)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                user.updatePassword(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
@@ -162,8 +133,7 @@ public class EditProfileActivity extends Activity {
                                                     Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
                                                     startActivity(intent);
                                                 }
-                                                else
-                                                {
+                                                else {
                                                     Toast.makeText(EditProfileActivity.this, "Couldn't change password",
                                                             Toast.LENGTH_SHORT).show();
                                                 }
@@ -178,60 +148,41 @@ public class EditProfileActivity extends Activity {
                             }
                         });
 
-        // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
         alertDialog.show();
     }
 
-    public void uploadData()
-    {
-       user = FirebaseAuth.getInstance().getCurrentUser();
+    public void uploadData() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
         String usernametxt = username.getText().toString();
         UserProfileChangeRequest profileUpdates;
-        if(path==null)
-        {
-                profileUpdates = new UserProfileChangeRequest.Builder()
-                        .setDisplayName(usernametxt)
-                        .build();
+        if(path==null) {
+            profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(usernametxt).build();
         }
-        else
-        {
-            profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(usernametxt)
-                    .setPhotoUri(path)
-                    .build();
+        else {
+            profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(usernametxt).setPhotoUri(path).build();
         }
         assert user != null;
-        user.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(EditProfileActivity.this, "Profile updated",
-                                    Toast.LENGTH_SHORT).show();
-                            finish();
-                            Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
-                            startActivity(intent);
-                        }
-                    }
-                });
+        user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(EditProfileActivity.this, "Profile updated", Toast.LENGTH_SHORT).show();
+                    finish();
+                    Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
-    public void deleteAccount()
-    {
+    public void deleteAccount() {
         String passwordConf;
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.dialog_input, null);
-
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
-        // set prompts.xml to alertdialog builder
         alertDialogBuilder.setView(promptsView);
-
-        final EditText userInput = promptsView
-                .findViewById(R.id.passwordDialog);
+        final EditText userInput = promptsView.findViewById(R.id.passwordDialog);
         TextView text = promptsView.findViewById(R.id.popupText);
         userInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
         text.setText("Do you really want to delete your account? \\n Confirm with password");
@@ -240,38 +191,28 @@ public class EditProfileActivity extends Activity {
             @Override
             public void onClick(View v) {
                 boolean on = see.isChecked();
-
                 if (on) {
                     userInput.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                } else {
+                }
+                else {
                     userInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
             }
         });
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton("OK",
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
                                 String passwordConf = userInput.getText().toString();
-
                                 user = FirebaseAuth.getInstance().getCurrentUser();
-                                AuthCredential credential = EmailAuthProvider
-                                        .getCredential(user.getEmail(), passwordConf);
-
-                                user.reauthenticate(credential)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), passwordConf);
+                                user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 Log.d("TAG", "User re-authenticated.");
                                             }
                                         });
                                 assert user != null;
-                                user.delete()
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
@@ -279,8 +220,7 @@ public class EditProfileActivity extends Activity {
                                                     Intent intent = new Intent(EditProfileActivity.this, MainActivity.class);
                                                     startActivity(intent);
                                                 }
-                                                else
-                                                {
+                                                else {
                                                     Toast.makeText(EditProfileActivity.this, "Couldn't delete account",
                                                             Toast.LENGTH_SHORT).show();
                                                 }
@@ -295,41 +235,23 @@ public class EditProfileActivity extends Activity {
                             }
                         });
 
-        // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
         alertDialog.show();
-
-
     }
-    public void imageHandle(View view)
-    {
+    public void imageHandle(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), GET_IMAGE);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), GET_IMAGE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == GET_IMAGE && resultCode == RESULT_OK && data.getData() !=null)
-        {
+        if(requestCode == GET_IMAGE && resultCode == RESULT_OK && data.getData() !=null) {
             path = data.getData();
-            //try {
-                //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), path);
-                //img.setImageBitmap(bitmap);
-                Glide.with(this).load(path).error(R.mipmap.ic_launcher)
-                        .placeholder(R.drawable.person)
-                        .into(img);
-            Toast.makeText(EditProfileActivity.this, path.toString(),
-                    Toast.LENGTH_SHORT).show();
-           // } catch (IOException e) {
-          //      e.printStackTrace();
-           // }
-
-             //   upload(image);
+            Glide.with(this).load(path).error(R.mipmap.ic_launcher).placeholder(R.drawable.person).into(img);
+            Toast.makeText(EditProfileActivity.this, path.toString(), Toast.LENGTH_SHORT).show();
 
         }
     }

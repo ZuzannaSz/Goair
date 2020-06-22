@@ -6,14 +6,12 @@ public class Latitude {
     private String Latitude;
     private String TimeStamp;
     public Latitude(){}
-    public Latitude(String Key, String IdBiker, String Latitude, String TimeStamp)
-    {
+    public Latitude(String Key, String IdBiker, String Latitude, String TimeStamp) {
         this.IdBiker=IdBiker;
         this.Key=Key;
         this.Latitude = Latitude;
         this.TimeStamp = TimeStamp;
     }
-
     public String getLatitude() {
         return Latitude;
     }

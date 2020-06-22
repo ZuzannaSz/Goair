@@ -1,11 +1,16 @@
 package com.example.goairtest;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +24,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.squareup.picasso.Picasso;
 
 public class SettingsActivity extends Activity {
     private Button login, map, home;
@@ -28,6 +32,8 @@ public class SettingsActivity extends Activity {
     private FirebaseUser user;
     private ImageView img;
     private TextView username, email;
+    private DatabaseHandler db;
+    private Context context;
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -37,43 +43,69 @@ public class SettingsActivity extends Activity {
         authView();
         handleLogin();
         navigation();
+        db = new DatabaseHandler(this);
+        context = this;
         img = findViewById(R.id.profileSet);
         user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user!=null)
-        {
+        if(user!=null) {
             Uri uri = user.getPhotoUrl();
-            String internetUrl = "https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc3/android_wallpaper5_2560x1600_1.jpg";
-            Toast.makeText(SettingsActivity.this, uri.toString(),
-                    Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SettingsActivity.this, uri.toString(), Toast.LENGTH_SHORT).show();
             if(uri!=null)
             {
                 Glide.with(this).load(uri).into(img);
-                //Picasso.with(.load(uri.toString()).into(img);
             }
             username = findViewById(R.id.nameSet);
             email = findViewById(R.id.mail);
             username.setText(user.getDisplayName());
-            // username.setText(uri.toString());
             email.setText(user.getEmail());
-
         }
-
-
         Button ch = findViewById(R.id.changePassword);
         ch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(user!=null)
-                {
+                if(user!=null) {
                     Intent intent = new Intent(SettingsActivity.this,EditProfileActivity.class);
                     startActivity(intent);
                 }
-
+            }
+        });
+        Button about = findViewById(R.id.about);
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity.this, AboutActivity.class);
+                startActivity(intent);
+            }
+        });
+        Button help = findViewById(R.id.settings_help);
+        help.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater li = LayoutInflater.from(context);
+                View promptsView = li.inflate(R.layout.dialog_help, null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder.setView(promptsView);
+                alertDialogBuilder.setCancelable(false)
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
+        Button reset = findViewById(R.id.resetData);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.deleteAll();
+                Toast.makeText(SettingsActivity.this, "Data deleted", Toast.LENGTH_SHORT).show();
             }
         });
     }
-    public void navigation()
-    {
+    public void navigation() {
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,8 +123,7 @@ public class SettingsActivity extends Activity {
             }
         });
     }
-    public void setup()
-    {
+    public void setup() {
         login = findViewById(R.id.loginMain);
         loginText = findViewById(R.id.loginView);
         map = findViewById(R.id.mapButton);
@@ -107,7 +138,6 @@ public class SettingsActivity extends Activity {
                     Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                     startActivity(intent);
                 } else {
-                    //popup here asking if you want to log out
                     AuthUI.getInstance().signOut(SettingsActivity.this)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -120,7 +150,7 @@ public class SettingsActivity extends Activity {
             }
         });
     }
-        public void authView(){
+    public void authView(){
         auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
         if(currentUser==null) {

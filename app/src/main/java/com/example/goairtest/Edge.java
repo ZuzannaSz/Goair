@@ -6,25 +6,20 @@ public class Edge {
     private int distance;
     private int polution;
     private boolean checked;
-    public Edge()
-    {}
-    public  Edge(int index, int distance)
-    {
+    public Edge() {}
+    public  Edge(int index, int distance) {
         this.index=index;
         this.distance=distance;
         this.checked =false;
     }
-    public Edge(int index, int distance, int polution)
-    {
+    public Edge(int index, int distance, int polution) {
         this.index = index;
         this.distance = distance;
         this.polution=polution;
         this.checked=false;
     }
-    public boolean isEqual(Edge edge)
-    {
-        if(this.index== edge.index)
-        {
+    public boolean isEqual(Edge edge) {
+        if(this.index== edge.index) {
             return true;
         }
         return false;

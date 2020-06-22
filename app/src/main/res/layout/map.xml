@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
-    tools:context=".MapFragment">
-
+    tools:context=".MapActivity">
 
 
     <TextView
@@ -36,8 +35,80 @@
         tools:layout_editor_absoluteX="-16dp" />
 
 
+    <EditText
+        android:id="@+id/start"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:hint="Choose starting point"
+        app:layout_constraintBottom_toBottomOf="@+id/textView7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/loginView"
+        app:layout_constraintVertical_bias="0.436" />
+
+    <EditText
+        android:id="@+id/end"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:hint="Choose destination"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/textView7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/loginView"
+        app:layout_constraintVertical_bias="0.904" />
+
+    <Button
+        android:id="@+id/switcher"
+        android:layout_width="61dp"
+        android:layout_height="54dp"
+        android:layout_marginBottom="34dp"
+        android:background="@drawable/invert"
+        app:layout_constraintBottom_toTopOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="@+id/textView7"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/start"
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/nav_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="580dp"
+        android:background="@color/white"
+        android:text="Start"
+        android:textColor="@color/green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.78"
+        app:layout_constraintStart_toEndOf="@+id/end"
+        app:layout_constraintTop_toBottomOf="@+id/spinner"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/spinner"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:background="@color/lightGreen"
+        android:text="Choose city"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.951"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.07" />
+
     <org.osmdroid.views.MapView
         android:id="@+id/map"
+        tilesource="Mapnik"
         android:layout_width="match_parent"
         android:layout_height="511dp"
         android:layout_marginTop="150dp"
@@ -47,13 +118,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tilesource="Mapnik" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
+        android:id="@+id/map_help"
         android:layout_width="30dp"
-        android:layout_height="30dp"
 
+        android:layout_height="30dp"
         android:background="@drawable/help"
         android:backgroundTint="@color/green"
         app:layout_constraintBottom_toBottomOf="parent"

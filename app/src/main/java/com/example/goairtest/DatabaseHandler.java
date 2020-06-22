@@ -57,8 +57,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MAP);
         onCreate(db);
     }
-    void addMap(StringData data)
-    {
+    void addMap(StringData data) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(KEY_IDB, data.getUserId());
@@ -69,8 +68,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.insert(TABLE_MAP,null,values);
 
     }
-    public List<Data>getLastMap()
-    {
+    public List<Data>getLastMap() {
         List<Data> dataList = new ArrayList<Data>();
         String selectQuery = "SELECT "+ KEY_ID + "," + KEY_IDB + "," + KEY_LATITUDE + "," + KEY_LONGITUDE + "," + KEY_POLLUTION +
                 ",MAX(" + KEY_DATE + ")" + " FROM " + TABLE_MAP + " GROUP BY " + KEY_LATITUDE + ","+ KEY_LONGITUDE ;
@@ -90,9 +88,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         db.close();
         return dataList;
-
     }
-
 
     void addData(Data data) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -117,7 +113,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.insert(TABLE_TH, null, values);
         db.close();
     }
-
     Data getData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_DATA, new String[]{KEY_ID,
@@ -137,8 +132,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return data;
     }
-    TempHum getTH(int id)
-    {
+    TempHum getTH(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_TH, new String[]{KEY_ID,
                         KEY_TEMPERATURE, KEY_HUMIDITY, KEY_DATE, KEY_UPDATE}, KEY_ID + "=?",
@@ -171,7 +165,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return -1;
     }
-
     public Data getLast() {
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_DATA + " ORDER BY " + KEY_ID + " DESC LIMIT 1";
@@ -193,8 +186,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return data;
     }
-    public TempHum getLastTH()
-    {
+    public TempHum getLastTH() {
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_TH + " ORDER BY " + KEY_ID + " DESC LIMIT 1";
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -215,8 +207,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(data.getID())});
         db.close();
     }
-    public void deleteMap()
-    {
+    public void deleteMap() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from " + TABLE_MAP);
         db.close();
@@ -242,13 +233,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return dataList;
     }
-    public boolean clearMap()
-    {
+    public boolean clearMap() {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_MAP, KEY_LONGITUDE + "=? OR " + KEY_POLLUTION + "=?", new String[]{"",""}) >0;
     }
-    public List<Data> getAllMapData()
-    {
+    public List<Data> getAllMapData() {
         List<Data> dataList = new ArrayList<Data>();
         String selectQuery = "SELECT  * FROM " + TABLE_MAP;
         SQLiteDatabase db = this.getWritableDatabase();
@@ -268,17 +257,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return dataList;
     }
-    public StringData getMapValue(String user, String date)
-    {
+    public StringData getMapValue(String user, String date) {
         StringData data = new StringData();
         String selectQuery = "SELECT * FROM " + TABLE_MAP + " WHERE " + KEY_IDB + " =? AND " + KEY_DATE + " =? ";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
-        try
-        {
+        try {
             cursor = db.rawQuery(selectQuery,  new String[] {user, date});
-            if(cursor.moveToFirst())
-            {
+            if(cursor.moveToFirst()) {
                 data.setId(cursor.getInt(0));
                 data.setUserId(cursor.getString(1));
                 data.setLatitude(cursor.getString(2));
@@ -290,11 +276,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if(cursor != null)
                 cursor.close();
         }
-
         return data;
     }
-    public int updateMap(StringData data)
-    {
+    public int updateMap(StringData data) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_IDB, data.getUserId());
@@ -305,8 +289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         int i = db.update(TABLE_MAP, values,  KEY_ID + " = " + data.getId(), null);
         return 0;
     }
-    public boolean checkDataPopulated()
-    {
+    public boolean checkDataPopulated() {
         boolean result =false;
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "select exists(select 1 from " + TABLE_MAP  + ");";
@@ -321,13 +304,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return result;
     }
+    public void deleteAll()
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("delete from " + TABLE_DATA);
+        db.execSQL("delete from "+ TABLE_TH);
+        db.close();
+    }
     public List<TempHum> getAllTH(){
         List<TempHum> thList = new ArrayList<TempHum>();
         String selectQuery = "SELECT * FROM " + TABLE_TH;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if(cursor.moveToFirst())
-        {
+        if(cursor.moveToFirst()) {
             do {
                 TempHum th = new TempHum();
                 th.setID(Integer.parseInt(cursor.getString(0)));
@@ -350,18 +339,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_DATE, data.getDate());
         values.put(KEY_UPDATE, data.getUpdate());
         int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + data.getID(), null);
-        return 0;}
-        public int updateTH(TempHum tempHum)
-        {
-            SQLiteDatabase db = this.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(KEY_TEMPERATURE, Integer.toString(tempHum.getTemperature()));
-            values.put(KEY_HUMIDITY, Integer.toString(tempHum.getHumidity()));
-            values.put(KEY_DATE, tempHum.getDate());
-            values.put(KEY_UPDATE, tempHum.getUpdate());
-            int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + tempHum.getID(), null);
-            return 0;
-        }
+        return 0;
+    }
+    public int updateTH(TempHum tempHum) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TEMPERATURE, Integer.toString(tempHum.getTemperature()));
+        values.put(KEY_HUMIDITY, Integer.toString(tempHum.getHumidity()));
+        values.put(KEY_DATE, tempHum.getDate());
+        values.put(KEY_UPDATE, tempHum.getUpdate());
+        int i = db.update(TABLE_DATA, values,  KEY_ID + " = " + tempHum.getID(), null);
+        return 0;
+    }
 }
     /*public boolean checkExistance(Data data) {
         SQLiteDatabase db = this.getReadableDatabase();
